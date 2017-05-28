@@ -12,9 +12,9 @@
 #include <ctime>
 #include <cstring>
 #include <iostream>
-
+#include <math.h>
 static int loopcnt=0;
-
+bool canprint=false;
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wconversion"
@@ -529,6 +529,19 @@ private:
     }
   }
 
+
+  void set_shm_actuators( int qid, float q_tar, float hardness_tar){
+    if (true){
+      if (true){
+        std::cout<<" data->newestActuators "<<data->newestActuators;
+        std::cout<<" data->readingActuators " << data->readingActuators;
+      }
+
+      float* readingActuators = data->actuators[data->newestActuators];
+      readingActuators[qid]=q_tar;
+      readingActuators[headYawHardnessActuator+qid]=hardness_tar;
+    }
+  }
   /** The method sets all actuators. */
   void setActuators()
   {
@@ -551,14 +564,18 @@ private:
       float* actuators = handleState(readingActuators);
 
       // ---------------------debug here..............
-      //state=standingUp;//-----------------debug
-      actuators[3]=1;
-      actuators[headYawHardnessActuator + 3]=1;
-      if ((loopcnt % 20) ==0){
+
+      actuators = readingActuators; // TODO: this is a hack for now, set actuators by brute force
+      if (canprint){
         std::cout<<"state "<<state<<std::endl;
         std::cout<< "readingActuators  set  ";
         for(int i = 0; i < lbhNumOfPositionActuatorIds; ++i){
             std::cout<<readingActuators[i]<<" ";
+        }
+        std::cout<<std::endl;
+        std::cout<< "Actuators  set  ";
+        for(int i = 0; i < lbhNumOfPositionActuatorIds; ++i){
+            std::cout<<actuators[i]<<" ";
         }
         std::cout<<std::endl;
       }
@@ -665,7 +682,7 @@ private:
 
       // ---------------------debug here.............
 
-      if ((loopcnt % 20) ==0) {
+      if (canprint) {
         std::cout<<"sensors ";
         for(int i = 0; i < lbhNumOfSensorIds; ++i){
             std::cout<<sensors[i]<<" ";
@@ -729,6 +746,14 @@ private:
    */
   static void onPreProcess()
   {
+    // --------------test set joints
+    //theInstance->state=standing;
+    canprint = (loopcnt % 20) == 0;
+    float qtar = cos(loopcnt*0.01f);
+    theInstance->set_shm_actuators(0,qtar,0.5f);
+    //--------------end of test
+
+
     theInstance->setActuators();
   }
 
