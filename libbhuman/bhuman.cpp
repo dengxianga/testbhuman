@@ -13,6 +13,8 @@
 #include <cstring>
 #include <iostream>
 
+static int loopcnt=0;
+
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wconversion"
@@ -345,6 +347,10 @@ private:
   int startPressedTime; /**< The last time the chest button was not pressed. */
   unsigned lastBHumanStartTime; /**< The last time bhuman was started. */
 
+
+
+
+
   /** Close all resources acquired. Called when initialization failed or during destruction. */
   void close()
   {
@@ -544,6 +550,20 @@ private:
       float* readingActuators = data->actuators[data->readingActuators];
       float* actuators = handleState(readingActuators);
 
+      // ---------------------debug here..............
+      //state=standingUp;//-----------------debug
+      actuators[3]=1;
+      actuators[headYawHardnessActuator + 3]=1;
+      if ((loopcnt % 20) ==0){
+        std::cout<<"state "<<state<<std::endl;
+        std::cout<< "readingActuators  set  ";
+        for(int i = 0; i < lbhNumOfPositionActuatorIds; ++i){
+            std::cout<<readingActuators[i]<<" ";
+        }
+        std::cout<<std::endl;
+      }
+      //////////////////////////////////////////////////
+
       if(state != standing)
       {
         if(frameDrops > 0 || state == shuttingDown)
@@ -557,8 +577,7 @@ private:
       positionRequest[4][0] = dcmTime; // 0 delay!
       for(int i = 0; i < lbhNumOfPositionActuatorIds; ++i)
         positionRequest[5][i][0] = actuators[i];
-        std::cout << actuators[i] << std::endl;
-        // positionRequest[5][i][0] = 0.0f;
+        //std::cout << actuators[i] << std::endl;
       proxy->setAlias(positionRequest);
 
       // set hardness actuators
@@ -644,7 +663,18 @@ private:
       for(int i = 0; i < lbhNumOfSensorIds; ++i)
         sensors[i] = *sensorPtrs[i];
 
-      // std::cout << *data->sensors[writingSensors] << std::endl;
+      // ---------------------debug here.............
+
+      if ((loopcnt % 20) ==0) {
+        std::cout<<"sensors ";
+        for(int i = 0; i < lbhNumOfSensorIds; ++i){
+            std::cout<<sensors[i]<<" ";
+        }
+        std::cout<<std::endl;
+      }
+
+        //////////////////////////////////////////////////
+       //std::cout << *data->sensors[writingSensors] << std::endl;
 
       // AL::ALValue value = memory->getData("GameCtrl/RoboCupGameControlData");
       // if(value.isBinary() && value.getSize() == sizeof(RoboCup::RoboCupGameControlData))
@@ -664,6 +694,8 @@ private:
           (void) !system("( /home/nao/bin/bhumand stop && sudo shutdown -h now ) &");
         state = preShuttingDown;
       }
+
+      loopcnt++;
     }
     catch(AL::ALError& e)
     {

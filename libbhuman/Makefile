@@ -1,13 +1,13 @@
 # Makefile used to build libraries
-include ../../../../../Makefile.am
+include ../Makefile.am
 
 TARGETS=all clean
 .PHONY: $(TARGETS)
 
 NaoQiSDK=/usr
-NaoQi_INC = -I/home/nao/naoqi-sdk-2.1.4.13-linux32/include
-NaoQi_LIB = -L/home/nao/naoqi-sdk-2.1.4.13-linux32/lib -lalcommon -lalerror -lalproxies -lalmemoryfastaccess
-
+NaoQi_INC = /home/nao/newnaoSDK/naoqi-sdk-2.1.4.13-linux32/include
+NaoQi_LIB = -L/home/nao/newnaoSDK/naoqi-sdk-2.1.4.13-linux32/lib -lalcommon -lalerror -lalproxies \
+																											-lalmemoryfastaccess
 INCLUDES=$(NaoQi_INC)
 
 CXXFLAGS +=-DDEBUG
@@ -17,7 +17,7 @@ all: libbhuman
 %.o: %.cpp %.h
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
 
-libbhuman: bhuman.o 
+libbhuman: bhuman.o
 
 	$(LD) $(LDFLAGS) -o $@.$(SHLIBEXT) $(LIBOPTS) $^ $(LIB_DIR) -lm -llua $(NaoQi_LIB)
 
