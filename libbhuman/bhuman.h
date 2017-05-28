@@ -1,32 +1,18 @@
 /**
- * @file bhuman.h
- * Declaration of shared data provided by libbhuman.
- */
+* @file bhuman.h
+* Declaration of shared data provided by libbhuman.
+*/
 
 #pragma once
 
-#include "Representations/Infrastructure/RoboCupGameControlData.h"
+#include "RoboCupGameControlData.h"
 
 #define LBH_SEM_NAME "/bhuman_sem"
 #define LBH_MEM_NAME "/bhuman_mem"
 
-enum NAOVersion
-{
-  V32,
-  V33,
-  V4,
-  V5,
-};
-
-enum NAOType
-{
-  H21,
-  H25,
-};
-
 enum LBHSensorIds
 {
-  // joint sensors
+  // joint data
   headYawPositionSensor,
   headYawCurrentSensor,
   headYawTemperatureSensor,
@@ -45,12 +31,6 @@ enum LBHSensorIds
   lElbowRollPositionSensor,
   lElbowRollCurrentSensor,
   lElbowRollTemperatureSensor,
-  lWristYawPositionSensor,
-  lWristYawCurrentSensor,
-  lWristYawTemperaturSensor,
-  lHandPositionSensor,
-  lHandCurrentSensor,
-  lHandTemperaturSensor,
   rShoulderPitchPositionSensor,
   rShoulderPitchCurrentSensor,
   rShoulderPitchTemperatureSensor,
@@ -63,12 +43,6 @@ enum LBHSensorIds
   rElbowRollPositionSensor,
   rElbowRollCurrentSensor,
   rElbowRollTemperatureSensor,
-  rWristYawPositionSensor,
-  rWristYawCurrentSensor,
-  rWristYawTemperaturSensor,
-  rHandPositionSensor,
-  rHandCurrentSensor,
-  rHandTemperaturSensor,
   lHipYawPitchPositionSensor,
   lHipYawPitchCurrentSensor,
   lHipYawPitchTemperatureSensor,
@@ -103,41 +77,14 @@ enum LBHSensorIds
   rAnkleRollCurrentSensor,
   rAnkleRollTemperatureSensor,
 
-  // touch sensors
-  headTouchFrontSensor,
-  headTouchMiddleSensor,
-  headTouchRearSensor,
-  lHandTouchBackSensor,
-  lHandTouchLeftSensor,
-  lHandTouchRightSensor,
-  rHandTouchBackSensor,
-  rHandTouchLeftSensor,
-  rHandTouchRightSensor,
-
-  // switches
-  lBumperLeftSensor,
-  lBumperRightSensor,
-  rBumperLeftSensor,
-  rBumperRightSensor,
-  chestButtonSensor,
-
-  // inertial sensors
+  // sensor data
   gyroXSensor,
   gyroYSensor,
-  gyroZSensor,
+  gyroRefSensor,
   accXSensor,
   accYSensor,
   accZSensor,
-  angleXSensor,
-  angleYSensor,
-
-  // battery sensors
-  batteryCurrentSensor,
   batteryChargeSensor,
-  batteryStatusSensor,
-  batteryTemperatureSensor,
-
-  // fsr sensors
   lFSRFrontLeftSensor,
   lFSRFrontRightSensor,
   lFSRRearLeftSensor,
@@ -146,8 +93,35 @@ enum LBHSensorIds
   rFSRFrontRightSensor,
   rFSRRearLeftSensor,
   rFSRRearRightSensor,
-  lFSRTotalSensor,
-  rFSRTotalSensor,
+  lUsSensor,
+  lUs1Sensor,
+  lUs2Sensor,
+  lUs3Sensor,
+  lUs4Sensor,
+  lUs5Sensor,
+  lUs6Sensor,
+  lUs7Sensor,
+  lUs8Sensor,
+  lUs9Sensor,
+  rUsSensor,
+  rUs1Sensor,
+  rUs2Sensor,
+  rUs3Sensor,
+  rUs4Sensor,
+  rUs5Sensor,
+  rUs6Sensor,
+  rUs7Sensor,
+  rUs8Sensor,
+  rUs9Sensor,
+  angleXSensor,
+  angleYSensor,
+
+  // key states
+  rBumperRightSensor,
+  rBumperLeftSensor,
+  lBumperRightSensor,
+  lBumperLeftSensor,
+  chestButtonSensor,
 
   lbhNumOfSensorIds,
 };
@@ -161,14 +135,10 @@ enum LBHActuatorIds
   lShoulderRollPositionActuator,
   lElbowYawPositionActuator,
   lElbowRollPositionActuator,
-  lWristYawPositionActuator,
-  lHandPositionActuator,
   rShoulderPitchPositionActuator,
   rShoulderRollPositionActuator,
   rElbowYawPositionActuator,
   rElbowRollPositionActuator,
-  rWristYawPositionActuator,
-  rHandPositionActuator,
   lHipYawPitchPositionActuator,
   lHipRollPositionActuator,
   lHipPitchPositionActuator,
@@ -180,34 +150,33 @@ enum LBHActuatorIds
   rKneePitchPositionActuator,
   rAnklePitchPositionActuator,
   rAnkleRollPositionActuator,
+  lHandPositionActuator,
+  rHandPositionActuator,
   lbhNumOfPositionActuatorIds,
 
-  // stiffness request
-  headYawStiffnessActuator = lbhNumOfPositionActuatorIds,
-  headPitchStiffnessActuator,
-  lShoulderPitchStiffnessActuator,
-  lShoulderRollStiffnessActuator,
-  lElbowYawStiffnessActuator,
-  lElbowRollStiffnessActuator,
-  lWristYawStiffnessActuator,
-  lHandStiffnessActuator,
-  rShoulderPitchStiffnessActuator,
-  rShoulderRollStiffnessActuator,
-  rElbowYawStiffnessActuator,
-  rElbowRollStiffnessActuator,
-  rWristYawStiffnessActuator,
-  rHandStiffnessActuator,
-  lHipYawPitchStiffnessActuator,
-  lHipRollStiffnessActuator,
-  lHipPitchStiffnessActuator,
-  lKneePitchStiffnessActuator,
-  lAnklePitchStiffnessActuator,
-  lAnkleRollStiffnessActuator,
-  rHipRollStiffnessActuator,
-  rHipPitchStiffnessActuator,
-  rKneePitchStiffnessActuator,
-  rAnklePitchStiffnessActuator,
-  rAnkleRollStiffnessActuator,
+  headYawHardnessActuator = lbhNumOfPositionActuatorIds,
+  headPitchHardnessActuator,
+  lShoulderPitchHardnessActuator,
+  lShoulderRollHardnessActuator,
+  lElbowYawHardnessActuator,
+  lElbowRollHardnessActuator,
+  rShoulderPitchHardnessActuator,
+  rShoulderRollHardnessActuator,
+  rElbowYawHardnessActuator,
+  rElbowRollHardnessActuator,
+  lHipYawPitchHardnessActuator,
+  lHipRollHardnessActuator,
+  lHipPitchHardnessActuator,
+  lKneePitchHardnessActuator,
+  lAnklePitchHardnessActuator,
+  lAnkleRollHardnessActuator,
+  rHipRollHardnessActuator,
+  rHipPitchHardnessActuator,
+  rKneePitchHardnessActuator,
+  rAnklePitchHardnessActuator,
+  rAnkleRollHardnessActuator,
+  lHandHardnessActuator,
+  rHandHardnessActuator,
 
   // led request
   faceLedRedLeft0DegActuator,
@@ -258,7 +227,6 @@ enum LBHActuatorIds
   faceLedBlueRight225DegActuator,
   faceLedBlueRight270DegActuator,
   faceLedBlueRight315DegActuator,
-  earsLedLeft0DegActuator,
   earsLedLeft36DegActuator,
   earsLedLeft72DegActuator,
   earsLedLeft108DegActuator,
@@ -268,6 +236,7 @@ enum LBHActuatorIds
   earsLedLeft252DegActuator,
   earsLedLeft288DegActuator,
   earsLedLeft324DegActuator,
+  earsLedLeft0DegActuator,
   earsLedRight0DegActuator,
   earsLedRight36DegActuator,
   earsLedRight72DegActuator,
@@ -281,24 +250,15 @@ enum LBHActuatorIds
   chestBoardLedRedActuator,
   chestBoardLedGreenActuator,
   chestBoardLedBlueActuator,
-  headLedRearLeft0Actuator,
-  headLedRearLeft1Actuator,
-  headLedRearLeft2Actuator,
-  headLedRearRight0Actuator,
-  headLedRearRight1Actuator,
-  headLedRearRight2Actuator,
-  headLedMiddleRight0Actuator,
-  headLedFrontRight0Actuator,
-  headLedFrontRight1Actuator,
-  headLedFrontLeft0Actuator,
-  headLedFrontLeft1Actuator,
-  headLedMiddleLeft0Actuator,
   lFootLedRedActuator,
   lFootLedGreenActuator,
   lFootLedBlueActuator,
   rFootLedRedActuator,
   rFootLedGreenActuator,
   rFootLedBlueActuator,
+  lbhNumOfNormalActuatorIds,
+
+  usActuator = lbhNumOfNormalActuatorIds,
 
   lbhNumOfActuatorIds
 };
@@ -311,9 +271,8 @@ enum LBHTeamInfoIds
   lbhNumOfTeamInfoIds
 };
 
-const int lbhNumOfStiffnessActuatorIds = lbhNumOfPositionActuatorIds;
+const int lbhNumOfHardnessActuatorIds = rHandHardnessActuator + 1 - headYawHardnessActuator;
 const int lbhNumOfLedActuatorIds = rFootLedBlueActuator + 1 - faceLedRedLeft0DegActuator;
-const int lbhNumOfDifSensors = 3;
 
 enum BHState
 {
@@ -338,12 +297,7 @@ struct LBHData
   volatile int readingActuators; /**< Index of actuator commands reserved for reading. */
   volatile int newestActuators; /**< Index of the newest actuator command. */
 
-  char bodyId[16]; /* Device/DeviceList/ChestBoard/BodyId */
-  char headId[16]; /* RobotConfig/Head/FullHeadId */
-  NAOVersion headVersion;
-  NAOVersion bodyVersion;
-  NAOType headType;
-  NAOType bodyType;
+  char robotName[24]; /* Device/DeviceList/ChestBoard/BodyNickName */
   float sensors[3][lbhNumOfSensorIds];
   float actuators[3][lbhNumOfActuatorIds];
   RoboCup::RoboCupGameControlData gameControlData[3];
