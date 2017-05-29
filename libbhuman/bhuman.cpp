@@ -13,8 +13,11 @@
 #include <cstring>
 #include <iostream>
 #include <math.h>
+#include <assert.h>
 static int loopcnt=0;
 bool canprint=false;
+int writingActuators=-1;
+
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wconversion"
@@ -351,6 +354,7 @@ private:
 
 
 
+
   /** Close all resources acquired. Called when initialization failed or during destruction. */
   void close()
   {
@@ -529,18 +533,41 @@ private:
     }
   }
 
-
-  void set_shm_actuators( int qid, float q_tar, float hardness_tar){
+  void openActuators(float*& actuators)
+  {
+    assert(writingActuators == -1);
+    writingActuators = 0;
+    if(writingActuators == data->newestActuators)
+      ++writingActuators;
+    if(writingActuators == data->readingActuators)
+      if(++writingActuators == data->newestActuators)
+        ++writingActuators;
+    assert(writingActuators != data->newestActuators);
+    assert(writingActuators != data->readingActuators);
+    actuators = data->actuators[writingActuators];
+  }
+  void closeActuators()
+  {
+    assert(writingActuators >= 0);
+    data->newestActuators = writingActuators;
+    writingActuators = -1;
+  }
+  void set_shm_item(float *& actuators, int qid, float q_tar, float hardness_tar){
     if (true){
-      if (true){
-        std::cout<<" data->newestActuators "<<data->newestActuators;
-        std::cout<<" data->readingActuators " << data->readingActuators;
-      }
-
-      float* readingActuators = data->actuators[data->newestActuators];
-      readingActuators[qid]=q_tar;
-      readingActuators[headYawHardnessActuator+qid]=hardness_tar;
+      actuators[qid]=q_tar;
+      actuators[headYawHardnessActuator+qid]=hardness_tar;
     }
+  }
+  void set_shm_actuators(){
+
+    float * actuators;
+    theInstance->openActuators(actuators);
+
+    //  TODO should be an array from input, tmp test for now
+    float qtar = cos(loopcnt*0.01f);
+    theInstance->set_shm_item(actuators, 0,qtar,0.5f);
+
+    theInstance->closeActuators();
   }
   /** The method sets all actuators. */
   void setActuators()
@@ -549,6 +576,11 @@ private:
     try
     {
       dcmTime = proxy->getTime(0);
+
+      if (true){
+        std::cout<<" data->nA "<<data->newestActuators;
+        std::cout<<" data->rA" << data->readingActuators<<std::endl;
+      }
 
       data->readingActuators = data->newestActuators;
       if(data->readingActuators == lastReadingActuators)
@@ -667,6 +699,7 @@ private:
     try
     {
       // copy sensor values into the shared memory block
+
       int writingSensors = 0;
       if(writingSensors == data->newestSensors)
         ++writingSensors;
@@ -675,6 +708,8 @@ private:
           ++writingSensors;
       assert(writingSensors != data->newestSensors);
       assert(writingSensors != data->readingSensors);
+
+
 
       float* sensors = data->sensors[writingSensors];
       for(int i = 0; i < lbhNumOfSensorIds; ++i)
@@ -698,6 +733,12 @@ private:
       //   memcpy(&data->gameControlData[writingSensors], value, sizeof(RoboCup::RoboCupGameControlData));
 
       data->newestSensors = writingSensors;
+
+      if (true){
+        std::cout<<" data->nS "<<data->newestSensors;
+        std::cout<<" data->rS" << data->readingSensors;
+        std::cout<<" ws " << writingSensors << std::endl;
+      }
 
       // detect shutdown request via chest-button
       if(*sensorPtrs[chestButtonSensor] == 0.f)
@@ -749,8 +790,7 @@ private:
     // --------------test set joints
     //theInstance->state=standing;
     canprint = (loopcnt % 20) == 0;
-    float qtar = cos(loopcnt*0.01f);
-    theInstance->set_shm_actuators(0,qtar,0.5f);
+    theInstance->set_shm_actuators();
     //--------------end of test
 
 
