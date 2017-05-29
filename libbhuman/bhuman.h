@@ -341,16 +341,16 @@ enum BHState
   sigTERMState = 15,
 };
 
-class LBHData
+struct LBHData
 {
-public:
+
 
   bool initialized;
   volatile int readingSensors; /**< Index of sensor data reserved for reading. */
   volatile int newestSensors; /**< Index of the newest sensor data. */
   volatile int readingActuators; /**< Index of actuator commands reserved for reading. */
   volatile int newestActuators; /**< Index of the newest actuator command. */
-  
+
   char bodyId[16]; /* Device/DeviceList/ChestBoard/BodyId */
   char headId[16]; /* RobotConfig/Head/FullHeadId */
   float sensors[3][lbhNumOfSensorIds];
@@ -361,7 +361,7 @@ public:
   int teamInfo[lbhNumOfTeamInfoIds];
   unsigned bhumanStartTime;
 
-  LBHData() : initialized(false) {}
+  LBHData(){initialized=false;}
 };
 
-LBHData* data = (LBHData*) MAP_FAILED;
+extern LBHData * data;

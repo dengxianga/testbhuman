@@ -13,6 +13,10 @@
 #include <cstring>
 #include <iostream>
 #include <assert.h>
+#include "bhuman.h"
+
+//LBHData* data;
+LBHData * data = (LBHData*) MAP_FAILED; // ----------------global shm----------
 
 static int loopcnt=0;
 bool canprint=false;
@@ -36,7 +40,6 @@ int writingActuators=-1;
 #pragma clang diagnostic pop
 #endif
 
-#include "bhuman.h"
 
 static const char* sensorNames[] =
 {
@@ -866,7 +869,7 @@ public:
    */
   BHuman(boost::shared_ptr<AL::ALBroker> pBroker) :
     ALModule(pBroker, "BHuman"),
-    // data((LBHData*) MAP_FAILED),
+    //data((LBHData*) MAP_FAILED),
     sem(SEM_FAILED),
     proxy(0),
     memory(0),
@@ -881,6 +884,8 @@ public:
     startPressedTime(0),
     lastBHumanStartTime(0)
   {
+
+
     setModuleDescription("A module that provides basic ipc NaoQi DCM access using shared memory.");
     fprintf(stderr, "libbhuman: Starting.\n");
 

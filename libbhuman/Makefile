@@ -12,7 +12,7 @@ INCLUDES=$(NaoQi_INC)
 
 CXXFLAGS +=-DDEBUG
 
-all: libbhuman
+all: libbhuman bhlowcmd
 
 %.o: %.cpp %.h
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
@@ -20,6 +20,10 @@ all: libbhuman
 libbhuman: bhuman.o
 
 	$(LD) $(LDFLAGS) -o $@.$(SHLIBEXT) $(LIBOPTS) $^ $(LIB_DIR) -lm -llua $(NaoQi_LIB)
+
+bhlowcmd: lua_dcmII.o
+	$(LD) $(LDFLAGS) -o $@.$(SHLIBEXT) $(LIBOPTS) $^ $(LIB_DIR) -lm -llua $(NaoQi_LIB)
+
 
 clean:
 	rm -f *.$(SHLIBEXT) *.o
