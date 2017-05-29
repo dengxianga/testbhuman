@@ -32,16 +32,18 @@
 #include "bhuman.h"
 using namespace std;
 
-int memoryHandle = shm_open(LBH_MEM_NAME, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
-LBHData * data = (LBHData*) mmap(NULL, sizeof(LBHData), PROT_READ | PROT_WRITE, MAP_SHARED, memoryHandle, 0);
+int fd;
+//int memoryHandle = shm_open(LBH_MEM_NAME, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
+LBHData * data;
 static int luaBH_getdummy (lua_State *L) {
   lua_pushnumber(L, 0);
-
   // TODO try to manipulate the shared memory "data"
-  if (data->initialized) {
-    float * actuators = data->actuators[data->newestActuators];
-    std::cout<<"here \n";
-  }
+  fd = shm_open(LBH_MEM_NAME, O_RDWR, S_IRUSR | S_IWUSR);
+  data = (LBHData*)mmap(NULL, sizeof(LBHData), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+
+  float * actuators = data->actuators[data->newestActuators];
+  std::cout<<"here " << actuators[0]<< " \n";
+
 
   return 1;
 }
