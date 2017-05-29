@@ -1,5 +1,5 @@
 /**
- * @file bhuman.cpp
+ * @file bhuman.cpp (2016)
  * Implementation of a NaoQi module that provides basic ipc NaoQi DCM access via semaphore and shared memory.
  */
 

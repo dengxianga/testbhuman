@@ -1,6 +1,6 @@
 
 /**
- * @file bhuman.h
+ * @file bhuman.h (2016)
  * Declaration of shared data provided by libbhuman.
  */
 
