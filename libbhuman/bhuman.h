@@ -364,4 +364,4 @@ struct LBHData
   LBHData(){initialized=false;}
 };
 
-extern LBHData * data;
+//extern LBHData * data;

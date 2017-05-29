@@ -1,3 +1,30 @@
+#include <sys/types.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <semaphore.h>
+#include <csignal>
+#include <sys/resource.h>
+#include <ctime>
+#include <cstring>
+
+#ifdef __clang__
+#pragma clang diagnostic push
+
+#pragma clang diagnostic ignored "-Wunknown-pragmas"
+#pragma clang diagnostic ignored "-Wconversion"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#pragma clang diagnostic ignored "-Wunused-local-typedef"
+#endif
+#define BOOST_SIGNALS_NO_DEPRECATION_WARNING
+#include <alcommon/albroker.h>
+#include <alcommon/alproxy.h>
+#include <alproxies/dcmproxy.h>
+#include <alproxies/almemoryproxy.h>
+#undef BOOST_SIGNALS_NO_DEPRECATION_WARNING
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
 #include <iostream>
 #include <lua.hpp>
 
@@ -5,10 +32,17 @@
 #include "bhuman.h"
 using namespace std;
 
+int memoryHandle = shm_open(LBH_MEM_NAME, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
+LBHData * data = (LBHData*) mmap(NULL, sizeof(LBHData), PROT_READ | PROT_WRITE, MAP_SHARED, memoryHandle, 0);
 static int luaBH_getdummy (lua_State *L) {
   lua_pushnumber(L, 0);
-  std::cout<<"here \n";
+
   // TODO try to manipulate the shared memory "data"
+  if (data->initialized) {
+    float * actuators = data->actuators[data->newestActuators];
+    std::cout<<"here \n";
+  }
+
   return 1;
 }
 
