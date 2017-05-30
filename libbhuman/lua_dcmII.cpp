@@ -57,13 +57,13 @@ static void lua_initialize () {
   initialized = true;
 }
 
-// static void lua_pushdouble_array(lua_State *L, double *v, int n) {
-//   lua_createtable(L, n, 0);
-//   for (int i = 0; i < n; i++) {
-//     lua_pushnumber(L, v[i]);
-//     lua_rawseti(L, -2, i+1);
-//   }
-// }
+static void lua_pushdouble_array(lua_State *L, double *v, int n) {
+  lua_createtable(L, n, 0);
+  for (int i = 0; i < n; i++) {
+    lua_pushnumber(L, v[i]);
+    lua_rawseti(L, -2, i+1);
+  }
+}
 
 // static void lua_pushvector(lua_State *L, std::vector<double> &v) {
 //   int n = v.size();
@@ -135,6 +135,9 @@ static void lua_initialize () {
 //   return 0;
 // }
 
+/**
+ ** Returns actuator command position
+ **/
 static int get_actuator_position(lua_State *L) {
   if (!initialized) {
     lua_initialize();
@@ -145,6 +148,9 @@ static int get_actuator_position(lua_State *L) {
   return 1;
 }
 
+/**
+ ** Returns actuator command hardness
+ **/
 static int get_actuator_hardness(lua_State *L) {
   if (!initialized) {
     lua_initialize();
@@ -155,6 +161,9 @@ static int get_actuator_hardness(lua_State *L) {
   return 1;
 }
 
+/**
+ ** Returns joint command positions
+ **/
 static int get_actuator_command(lua_State *L) {
   get_actuator_position(L);
 }
@@ -188,6 +197,9 @@ static int get_actuator_command(lua_State *L) {
 //   return 1;
 // }
 
+/**
+ ** Returns joint positions read by sensors
+ **/
 static int get_sensor_position(lua_State *L) {
   if (!initialized) {
     lua_initialize();
@@ -198,15 +210,21 @@ static int get_sensor_position(lua_State *L) {
   return 1;
 }
 
-// static int get_sensor_positions(lua_State *L) {
-//   lua_pushdouble_array(L, pSensor->position, nJoint);
-//   return 1;
-// }
+/**
+ ** not sure what this is supposed to do
+ **/
+static int get_sensor_positions(lua_State *L) {
+  // lua_pushdouble_array(L, pSensor->position, nJoint);
+  return 1;
+}
 
-// static int get_imu_angle(lua_State *L) {
-//   lua_pushdouble_array(L, pSensor->imu, 2);
-//   return 1;
-// }
+/**
+ ** Returns joint positions read by sensors
+ **/
+static int get_imu_angle(lua_State *L) {
+  lua_pushdouble_array(L, pSensor->imu, 2);
+  return 1;
+}
 
 // static int get_imu_acc(lua_State *L) {
 //   lua_pushdouble_array(L, pSensor->imu+2, 3);
@@ -237,7 +255,7 @@ static const struct luaL_Reg bhlowcmd_lib [] = {
   // {"get_actuator_hardnesses", get_actuator_hardnesses},
 
   {"get_sensor_position", get_sensor_position},
-  // {"get_sensor_positions", get_sensor_positions},
+  {"get_sensor_positions", get_sensor_positions},
 
   // {"get_imu_angle", get_imu_angle},
   // {"get_imu_acc", get_imu_acc},
