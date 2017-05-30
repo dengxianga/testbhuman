@@ -844,7 +844,7 @@ private:
     // --------------test set joints
     //theInstance->state=standing;
     canprint = (loopcnt % 20) == 0;
-    theInstance->set_shm_actuators();
+    //theInstance->set_shm_actuators();
     //--------------end of test
 
 
