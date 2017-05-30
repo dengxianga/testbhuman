@@ -14,7 +14,7 @@
 enum LBHSensorIds
 {
   // joint sensors
-  headYawPositionSensor,
+  headYawPositionSensor = 0,
   headYawCurrentSensor,
   headYawTemperatureSensor,
   headPitchPositionSensor,
@@ -163,7 +163,7 @@ enum LBHSensorIds
 enum LBHActuatorIds
 {
   // joint request
-  headYawPositionActuator,
+  headYawPositionActuator = 0,
   headPitchPositionActuator,
   lShoulderPitchPositionActuator,
   lShoulderRollPositionActuator,
