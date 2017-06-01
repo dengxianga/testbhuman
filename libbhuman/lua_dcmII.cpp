@@ -135,7 +135,7 @@ static int set_actuator_positions(lua_State *L) {
   }
 
   data->luaNewSet = true;
-  ///////// 
+  /////////
 
   std::cout<<data->luaNewSet<<std::endl;
 
@@ -178,8 +178,8 @@ static int set_actuator_position_forever(lua_State *L) {
       cnt++;
 
       float * sensors = data->sensors[data->newestSensors];
-      std::cout<<sensors[2*ids[1]]<< std::endl;
-      
+      std::cout<<sensors[1+3*(int)ids[1]]<< std::endl;
+
     }
     std::cout<<data->luaNewSet<<std::endl;
 
@@ -248,7 +248,7 @@ static int get_sensor_current(lua_State *L) {
   }
   int index = luaL_checkint(L, 1) - 1; // convert to zero-indexed, add 26
   float * sensors = data->sensors[data->newestSensors];
-  lua_pushnumber(L, (double) sensors[2*index]);
+  lua_pushnumber(L, (double) sensors[1+3*index]);
   return 1;
 }
 
