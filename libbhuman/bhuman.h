@@ -14,7 +14,7 @@
 enum LBHSensorIds
 {
   // joint sensors
-  headYawPositionSensor = 0,
+  headYawPositionSensor,
   headYawCurrentSensor,
   headYawTemperatureSensor,
   headPitchPositionSensor,
@@ -163,7 +163,7 @@ enum LBHSensorIds
 enum LBHActuatorIds
 {
   // joint request
-  headYawPositionActuator = 0,
+  headYawPositionActuator,
   headPitchPositionActuator,
   lShoulderPitchPositionActuator,
   lShoulderRollPositionActuator,
@@ -344,7 +344,7 @@ enum BHState
 struct LBHData
 {
 
-
+  bool luaNewSet;
   bool initialized;
   volatile int readingSensors; /**< Index of sensor data reserved for reading. */
   volatile int newestSensors; /**< Index of the newest sensor data. */
@@ -355,13 +355,15 @@ struct LBHData
   char headId[16]; /* RobotConfig/Head/FullHeadId */
   float sensors[3][lbhNumOfSensorIds];
   float actuators[3][lbhNumOfActuatorIds];
+  float luaBuffer[lbhNumOfActuatorIds];
   RoboCup::RoboCupGameControlData gameControlData[3];
 
   BHState state;
   int teamInfo[lbhNumOfTeamInfoIds];
   unsigned bhumanStartTime;
 
-  LBHData(){initialized=false;}
+  LBHData(){initialized=false; 
+            luaNewSet = false;}
 };
 
 //extern LBHData * data;

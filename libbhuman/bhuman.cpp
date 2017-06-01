@@ -630,17 +630,26 @@ private:
       actuators[headYawStiffnessActuator+qid]=hardness_tar;
     }
   }
-  void set_shm_actuators(){
+  void set_shm_actuators(float* buffer){
 
     float * actuators;
+    // theInstance->openActuators(actuators);
+
+    // //  TODO should be an array from input, tmp test for now
+    // float qtar = cos(loopcnt*0.01f);
+    // theInstance->set_shm_item(actuators, 0,qtar,0.5f);
+    // theInstance->closeActuators();
+
     theInstance->openActuators(actuators);
 
-    //  TODO should be an array from input, tmp test for now
-    float qtar = cos(loopcnt*0.01f);
-    theInstance->set_shm_item(actuators, 0,qtar,0.5f);
+    // buffer[0] = cos(loopcnt*0.01f);
+    for (unsigned int i = 0; i < lbhNumOfActuatorIds; i++) {
+      actuators[i] = buffer[i];
+    }
 
     theInstance->closeActuators();
   }
+
   /** The method sets all actuators. */
   void setActuators()
   {
@@ -666,19 +675,19 @@ private:
       // ---------------------debug here..............
 
       actuators = readingActuators; // TODO: this is a hack for now, set actuators by brute force
-      if (canprint){
-        std::cout<<"state "<<state<<std::endl;
-        std::cout<< "readingActuators  set  ";
-        for(int i = 0; i < lbhNumOfPositionActuatorIds; ++i){
-            std::cout<<readingActuators[i]<<" ";
-        }
-        std::cout<<std::endl;
-        std::cout<< "Actuators  set  ";
-        for(int i = 0; i < lbhNumOfPositionActuatorIds; ++i){
-            std::cout<<actuators[i]<<" ";
-        }
-        std::cout<<std::endl;
-      }
+      // if (canprint){
+      //   std::cout<<"state "<<state<<std::endl;
+      //   std::cout<< "readingActuators  set  ";
+      //   for(int i = 0; i < lbhNumOfPositionActuatorIds; ++i){
+      //       std::cout<<readingActuators[i]<<" ";
+      //   }
+      //   std::cout<<std::endl;
+      //   std::cout<< "Actuators  set  ";
+      //   for(int i = 0; i < lbhNumOfPositionActuatorIds; ++i){
+      //       std::cout<<actuators[i]<<" ";
+      //   }
+      //   std::cout<<std::endl;
+      // }
       //////////////////////////////////////////////////
 
 
@@ -841,13 +850,25 @@ private:
    */
   static void onPreProcess()
   {
+    std::cout << "start of onPreProcess"<<std::endl;
     // --------------test set joints
     //theInstance->state=standing;
     canprint = (loopcnt % 20) == 0;
     //theInstance->set_shm_actuators();
+
     //--------------end of test
+    // data->luaNewSet = true;
+    // std::cout<< "luaNewSet: "<< data->luaNewSet <<std::endl;
+    if (data->luaNewSet) {
+      theInstance->set_shm_actuators(data->luaBuffer);
+      data->luaNewSet = false;
 
+      std::cout<< "lua buffer: "<<data->luaBuffer[0];
+      std::cout<< "  data->actuators[1]: "<< data->actuators[data->newestActuators][0]<<std::endl;
+    }
 
+    // theInstance->set_shm_actuators(data->luaBuffer);
+    std::cout<<theInstance->dcmTime<<std::endl;
     theInstance->setActuators();
   }
 
@@ -857,6 +878,7 @@ private:
    */
   static void onPostProcess()
   {
+    std::cout << "start of onPostProcess"<<std::endl;
     theInstance->readSensors();
   }
 
