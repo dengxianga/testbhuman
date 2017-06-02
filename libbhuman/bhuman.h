@@ -355,7 +355,7 @@ struct LBHData
   char headId[16]; /* RobotConfig/Head/FullHeadId */
   float sensors[3][lbhNumOfSensorIds];
   float actuators[3][lbhNumOfActuatorIds];
-  float luaBuffer[lbhNumOfActuatorIds];
+  float luaBuffer[lbhNumOfActuatorIds * 2];
   RoboCup::RoboCupGameControlData gameControlData[3];
 
   BHState state;

@@ -643,7 +643,7 @@ private:
     theInstance->openActuators(actuators);
 
     // buffer[0] = cos(loopcnt*0.01f);
-    for (unsigned int i = 0; i < lbhNumOfActuatorIds; i++) {
+    for (unsigned int i = 0; i < 2*lbhNumOfActuatorIds; i++) {
       actuators[i] = buffer[i];
     }
 
