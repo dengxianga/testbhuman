@@ -95,7 +95,29 @@ const int nJointRArm = 4;
 // {RElbowYaw, rElbowYawPositionActuator},
 // {RElbowRoll, rElbowRollPositionActuator}
 
-int luaToBHumanPos[nJoint] = {headYawPositionActuator, headPitchPositionActuator,  lShoulderPitchPositionActuator,  lShoulderRollPositionActuator,  lElbowYawPositionActuator,  lElbowRollPositionActuator,  lHipYawPitchPositionActuator, lHipRollPositionActuator, lHipPitchPositionActuator,  lKneePitchPositionActuator,  lAnklePitchPositionActuator,  lAnkleRollPositionActuator, lHipYawPitchPositionActuator, rHipRollPositionActuator, rHipPitchPositionActuator,  rKneePitchPositionActuator, rAnklePitchPositionActuator,  rAnkleRollPositionActuator, rShoulderPitchPositionActuator,  rShoulderRollPositionActuator,  rElbowYawPositionActuator,  rElbowRollPositionActuator};
+int luaToBHumanPos[nJoint] = {
+headYawPositionActuator, 
+headPitchPositionActuator,  
+lShoulderPitchPositionActuator,
+lShoulderRollPositionActuator,  
+lElbowYawPositionActuator,  
+lElbowRollPositionActuator,  
+lHipYawPitchPositionActuator, 
+lHipRollPositionActuator, 
+lHipPitchPositionActuator,  
+lKneePitchPositionActuator,  
+lAnklePitchPositionActuator,  
+lAnkleRollPositionActuator, 
+lHipYawPitchPositionActuator, 
+rHipRollPositionActuator, 
+rHipPitchPositionActuator,  
+rKneePitchPositionActuator, 
+rAnklePitchPositionActuator,  
+rAnkleRollPositionActuator, 
+rShoulderPitchPositionActuator,  
+rShoulderRollPositionActuator,  
+rElbowYawPositionActuator,  
+rElbowRollPositionActuator};
 
 int fd;
 //int memoryHandle = shm_open(LBH_MEM_NAME, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
@@ -356,10 +378,11 @@ static int get_actuator_command(lua_State *L) {
   data->readingActuators = data->newestActuators;
   float * actuators = data->actuators[data->newestActuators];
   double actuatorCommands[nJoint];
-  for (int i = 0; i < nJoint; i++) {
+  for (int i = 0; i < numActuators; i++) {
     int bHumanIndex = luaToBHumanPos[i];
     actuatorCommands[i] = (double) actuators[bHumanIndex];
   }
+  lua_pushdouble_array(L, actuatorCommands, numActuators);
   return 1;
 }
 
@@ -405,7 +428,7 @@ static int get_actuator_hardnesses(lua_State *L) {
   data->readingActuators = data->newestActuators;
   float * actuators = data->actuators[data->readingActuators];
   double actuatorHardnesses[nJoint];
-  for (int i = 0; i < lbhNumOfPositionActuatorIds; i++) {
+  for (int i = 0; i < nJoint; i++) {
     int bHumanIndex = luaToBHumanPos[i];
     actuatorHardnesses[i] = (double) actuators[bHumanIndex +lbhNumOfPositionActuatorIds];
   }
@@ -512,6 +535,12 @@ static int get_sensor_current(lua_State *L) {
   float * sensors = data->sensors[data->newestSensors];
   lua_pushnumber(L, (double) 1000 * sensors[3*bHumanIndex+1]);
   return 1;
+}
+
+static int set_actuator_velocity(lua_State *L) {
+  double x = luaL_checknumber(L, 1);
+  int index = luaL_checkint(L, 2) - 1; // convert to zero-indexed
+  return 0;
 }
 
 static const struct luaL_Reg bhlowcmd_lib [] = {
