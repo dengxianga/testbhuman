@@ -554,15 +554,31 @@ static int get_sensor_current(lua_State *L) {
 }
 
 static int set_actuator_velocity(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
   double x = luaL_checknumber(L, 1);
   int index = luaL_checkint(L, 2) - 1; // convert to zero-indexed
   return 0;
 }
 
 static int get_actuator_velocity(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
   int index = luaL_checkint(L, 1) - 1; // convert to zero-indexed
   lua_pushnumber(L, 0);
   return 0;
+}
+
+static int get_time(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
+  while (!data->newTime) {} // wait for new time
+  lua_pushnumber(L, data->dcmTime);
+  data->newTime = false;
+  return 1;
 }
 
 static const struct luaL_Reg bhlowcmd_lib [] = {
@@ -590,6 +606,7 @@ static const struct luaL_Reg bhlowcmd_lib [] = {
   {"get_flag", get_flag},
   {"set_actuator_position_forever", set_actuator_position_forever},
   {"get_sensor_current", get_sensor_current},
+  {"get_time", get_time},
 
   // in original file but not implemented in this one
   // {"set_actuator_mode", set_actuator_mode},

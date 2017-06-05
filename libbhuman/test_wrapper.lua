@@ -75,7 +75,7 @@ function printAllStiffnesses()
 end
 
 function printTime()
-  print('time: ', unix.time());
+  print('time: ', bhlowcmd.get_time());
 end
 
 function printActuatorPosition()
@@ -84,25 +84,25 @@ function printActuatorPosition()
 end
 
 --------- Script ---------
-bhlowcmd.get_sensor_position(1);
+-- bhlowcmd.get_sensor_position(1);
 --bhlowcmd.set_actuator_hardnesses(stfs,ids)
 --
---while 1 do
+while 1 do
 --  ------ Movement ------
 --	qs[1]= math.cos(speed*cnt);
 --  bhlowcmd.set_actuator_positions(qs,ids);
 --  ----------------------
 --
---  ----- Print Inside ----
---  if (cnt % 100000 == 0) then
---    printSensorPosition();
---  end  
---  -----------------------
---
---	local tDelay = 0.0025 * 1E6; -- Loop every 2.5ms
---	unix.usleep(tDelay);
---  cnt=cnt+1;
---end
+ ----- Print Inside ----
+ if (cnt % 10 == 0) then
+   printTime();
+end
+ -----------------------
+
+	local tDelay = 0.0025 * 1E6; -- Loop every 2.5ms
+	unix.usleep(tDelay);
+ cnt=cnt+1;
+end
 
 
 

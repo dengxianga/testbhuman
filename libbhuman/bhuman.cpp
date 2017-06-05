@@ -850,7 +850,7 @@ private:
    */
   static void onPreProcess()
   {
-    std::cout << "start of onPreProcess"<<std::endl;
+    // std::cout << "start of onPreProcess"<<std::endl;
     // --------------test set joints
     //theInstance->state=standing;
     canprint = (loopcnt % 20) == 0;
@@ -863,11 +863,13 @@ private:
       theInstance->set_shm_actuators(data->luaBuffer);
       data->luaNewSet = false;
 
-      std::cout<< "lua buffer: "<<data->luaBuffer[0];
-      std::cout<< "  data->actuators[1]: "<< data->actuators[data->newestActuators][0]<<std::endl;
+      // std::cout<< "lua buffer: "<<data->luaBuffer[0];
+      // std::cout<< "  data->actuators[1]: "<< data->actuators[data->newestActuators][0]<<std::endl;
     }
 
     // theInstance->set_shm_actuators(data->luaBuffer);
+    data->dcmTime = theInstance->dcmTime;
+    data->newTime = true;
     std::cout<<theInstance->dcmTime<<std::endl;
     theInstance->setActuators();
   }
@@ -878,7 +880,7 @@ private:
    */
   static void onPostProcess()
   {
-    std::cout << "start of onPostProcess"<<std::endl;
+    // std::cout << "start of onPostProcess"<<std::endl;
     theInstance->readSensors();
   }
 

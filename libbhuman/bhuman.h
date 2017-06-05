@@ -350,8 +350,8 @@ struct LBHData
   volatile int newestSensors; /**< Index of the newest sensor data. */
   volatile int readingActuators; /**< Index of actuator commands reserved for reading. */
   volatile int newestActuators; /**< Index of the newest actuator command. */
-  // volatile int dcmTime; //**< System time from naoqi
-  // bool newTime; //**< Has naoqi given a new time?
+  volatile int dcmTime; //**< System time from naoqi
+  bool newTime; //**< Has naoqi given a new time?
 
   char bodyId[16]; /* Device/DeviceList/ChestBoard/BodyId */
   char headId[16]; /* RobotConfig/Head/FullHeadId */
