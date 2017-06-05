@@ -15,7 +15,7 @@ require('init')
 
 local qs={0.1, 0};
 local stfs={0.5, 0.5}
-local ids={1, 2};
+local ids={3, 1};
 
 local cnt=1;
 
@@ -31,7 +31,9 @@ if true then
 
     -- end
     local result = bhlowcmd.get_actuator_position(ids[1]);
-    qs[1]= math.cos(speed*0.3*cnt);
+    for i=1,#ids do
+      qs[i]= math.cos(speed*0.3*cnt);
+    end
     bhlowcmd.set_actuator_positions(qs,ids)
 
     print('actual ', result, 'expected ', qs[1]);
