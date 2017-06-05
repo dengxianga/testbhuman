@@ -32,6 +32,7 @@
 #include "bhuman.h"
 using namespace std;
 double speed = 0.01;
+double current_time = 0;
 
 enum jointNames { 
 HeadYaw = 0, 
@@ -256,12 +257,22 @@ static int set_actuator_hardnesses(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
-  std::vector<double> vs = lua_checkvector(L, 1);
-  std::vector<double> ids = lua_checkvector(L, 2);
+  // std::vector<double> vs = lua_checkvector(L, 1);
+  // std::vector<double> ids = lua_checkvector(L, 2);
 
-  for (unsigned int i = 0; i < vs.size(); i++) {
-    int bHumanIndex = luaToBHumanPos[(int) ids[i] - 1];
-    data->luaBuffer[bHumanIndex + lbhNumOfPositionActuatorIds] = vs[i];
+  // for (unsigned int i = 0; i < vs.size(); i++) {
+  //   int bHumanIndex = luaToBHumanPos[(int) ids[i] - 1];
+  //   data->luaBuffer[bHumanIndex + lbhNumOfPositionActuatorIds] = vs[i];
+  // }
+
+  // data->luaNewSet = true;
+
+  std::vector<double> hardness_values = lua_checkvector(L, 1);
+  int startIndex = luaL_checkint(L, 2) - 1;
+  
+  for (int i = startIndex; i < startIndex + hardness_values.size(); i++) {
+    int bHumanIndex = luaToBHumanPos[i];
+    data->luaBuffer[bHumanIndex + lbhNumOfPositionActuatorIds] = hardness_values[i];
   }
 
   data->luaNewSet = true;
@@ -324,7 +335,7 @@ static int get_actuator_hardness(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
-  int index = luaL_checkint(L, 1) -1; // convert to zero-indexed
+  int index = luaL_checkint(L, 1) - 1; // convert to zero-indexed
   data->readingActuators = data->newestActuators;
   float * actuators = data->actuators[data->readingActuators];
 
@@ -397,6 +408,7 @@ static int get_sensor_position(lua_State *L) {
   float * sensors = data->sensors[data->newestSensors];
   int bHumanIndex = luaToBHumanPos[index];
   lua_pushnumber(L, (double) sensors[3*bHumanIndex]);
+
   return 1;
 }
 
@@ -415,6 +427,9 @@ static int get_sensor_positions(lua_State *L) {
     actuatorSensors[i] = (double) sensors[3*bHumanIndex];
   }
   lua_pushdouble_array(L, (double*) actuatorSensors, (int) nJoint);
+  
+  std::cout<< "get_sensor_positions is being called from bhlowcmd"<< std::endl;
+
   return 1;
 }
 
@@ -433,6 +448,8 @@ static int get_actuator_hardnesses(lua_State *L) {
     actuatorHardnesses[i] = (double) actuators[bHumanIndex +lbhNumOfPositionActuatorIds];
   }
   lua_pushdouble_array(L, (double*) actuatorHardnesses, (int) nJoint);
+
+
   return 1;
 }
 
@@ -524,7 +541,6 @@ static int set_actuator_position_forever(lua_State *L) {
   }
 }
 
-
 static int get_sensor_current(lua_State *L) {
   if (!initialized) {
     lua_initialize();
@@ -540,6 +556,12 @@ static int get_sensor_current(lua_State *L) {
 static int set_actuator_velocity(lua_State *L) {
   double x = luaL_checknumber(L, 1);
   int index = luaL_checkint(L, 2) - 1; // convert to zero-indexed
+  return 0;
+}
+
+static int get_actuator_velocity(lua_State *L) {
+  int index = luaL_checkint(L, 1) - 1; // convert to zero-indexed
+  lua_pushnumber(L, 0);
   return 0;
 }
 
@@ -571,8 +593,8 @@ static const struct luaL_Reg bhlowcmd_lib [] = {
 
   // in original file but not implemented in this one
   // {"set_actuator_mode", set_actuator_mode},
-  // {"set_actuator_velocity", set_actuator_velocity},
-  // {"get_actuator_velocity", get_actuator_velocity},
+  {"set_actuator_velocity", set_actuator_velocity},
+  {"get_actuator_velocity", get_actuator_velocity},
   // {"set_actuator_joint_imu_angle_x", set_actuator_joint_imu_angle_x},
   // {"set_actuator_joint_imu_angle_y", set_actuator_joint_imu_angle_y},
   

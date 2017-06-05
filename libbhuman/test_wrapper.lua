@@ -1,7 +1,10 @@
 cwd = cwd or os.getenv('PWD')
 package.path = cwd.."/?.lua;"..package.path;
 
-bhlowcmd = require 'bhlowcmd'
+bhlowcmd = require('bhlowcmd')
+
+--host = 'bhlowcmd';
+
 require('init')
 -- require('Config');
 -- require('Body')
@@ -45,8 +48,8 @@ function printImuGyro()
 end
 
 function printSensorPosition()
-  local RShoulderPitchSensor = bhlowcmd.get_sensor_position(9);
-  print(RShoulderPitchSensor);
+  local sensorVal = bhlowcmd.get_sensor_position(1);
+  print(sensorVal);
 end
 
 function printActuatorCommand()
@@ -80,25 +83,26 @@ function printActuatorPosition()
   print('actual ', result, 'expected ', qs[1]);
 end
 
-------- Script ---------
-bhlowcmd.set_actuator_hardnesses(stfs,ids)
-
-while 1 do
-  ------ Movement ------
-	qs[1]= math.cos(speed*cnt);
-  bhlowcmd.set_actuator_positions(qs,ids);
-  ----------------------
-
-  ----- Print Inside ----
-  if (cnt % 100 == 0) then
-    printAllSensors();
-  end  
-  -----------------------
-
-	local tDelay = 0.0025 * 1E6; -- Loop every 2.5ms
-	unix.usleep(tDelay);
-  cnt=cnt+1;
-end
+--------- Script ---------
+bhlowcmd.get_sensor_position(1);
+--bhlowcmd.set_actuator_hardnesses(stfs,ids)
+--
+--while 1 do
+--  ------ Movement ------
+--	qs[1]= math.cos(speed*cnt);
+--  bhlowcmd.set_actuator_positions(qs,ids);
+--  ----------------------
+--
+--  ----- Print Inside ----
+--  if (cnt % 100000 == 0) then
+--    printSensorPosition();
+--  end  
+--  -----------------------
+--
+--	local tDelay = 0.0025 * 1E6; -- Loop every 2.5ms
+--	unix.usleep(tDelay);
+--  cnt=cnt+1;
+--end
 
 
 
