@@ -85,7 +85,7 @@ end
 
 --------- Script ---------
 -- bhlowcmd.get_sensor_position(1);
---bhlowcmd.set_actuator_hardnesses(stfs,ids)
+bhlowcmd.set_actuator_hardnesses(stfs,ids)
 --
 while 1 do
 --  ------ Movement ------
@@ -103,8 +103,6 @@ end
 	unix.usleep(tDelay);
  cnt=cnt+1;
 end
-
-
 
 
 -- bhlowcmd.set_actuator_position_forever(ids, ids);
