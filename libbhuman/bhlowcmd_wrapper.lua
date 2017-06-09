@@ -4,9 +4,9 @@ package.path = cwd.."/?.lua;"..package.path;
 bhlowcmd = require 'bhlowcmd'
 require('init')
 
-function set_actuator_hardnesses(values, indices)
-	bhlowcmd.set_actuator_hardnesses(values, indicies); 
-end
+-- function set_actuator_hardnesses(values, indices)
+-- 	bhlowcmd.set_actuator_hardnesses(values, indices); 
+-- end
 
 function set_actuator_positions(values, indices)
 	bhlowcmd.set_actuator_positions(values, indicies); 
@@ -21,7 +21,11 @@ function set_actuator_hardness(values, index)
 		bhlowcmd.set_actuator_hardness(values, index);
 	else
 		index = index or 0;
-		bhlowcmd.set_actuator_hardnesses(values, index); 
+		local indices = vector.zeros(#values);
+		for i = 1, #values do
+			indices[i] = index + i;
+		end
+		bhlowcmd.set_actuator_hardnesses(values, indices);
 	end
 end
 
@@ -78,7 +82,7 @@ function get_imu_acc()
 	return result;
 end
 
-function get_imy_gyr()
+function get_sensor_imuGyr()
 	local result = bhlowcmd.get_imu_gyr(); 
 	return result;
 end
@@ -89,6 +93,31 @@ end
 
 function get_actuator_velocity(index)
 	local result = bhlowcmd.get_actuator_velocity(index);
+	return result;
+end
+
+function get_sensor_batteryCharge()
+	local result = bhlowcmd.get_sensor_batteryCharge();
+	return result;
+end
+
+function get_sensor_button()
+	local result = bhlowcmd.get_sensor_button();
+	return result;
+end
+
+-- function get_sensor_bumperLeft()
+-- 	local result = bhlowcmd.get_sensor_bumperLeft();
+-- 	return result;
+-- end
+
+-- function get_sensor_bumperRight()
+-- 	local result = bhlowcmd.get_sensor_bumperRight();
+-- 	return result;
+-- end
+
+function get_sensor_time(index)
+	local result = bhlowcmd.get_time();
 	return result;
 end
 

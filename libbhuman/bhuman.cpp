@@ -139,14 +139,15 @@ static const char* sensorNames[] =
   "Device/SubDeviceList/ChestBoard/Button/Sensor/Value",
 
   // inertial sensors
-  "Device/SubDeviceList/InertialSensor/GyroscopeX/Sensor/Value",
-  "Device/SubDeviceList/InertialSensor/GyroscopeY/Sensor/Value",
-  "Device/SubDeviceList/InertialSensor/GyroscopeZ/Sensor/Value",
-  "Device/SubDeviceList/InertialSensor/AccelerometerX/Sensor/Value",
-  "Device/SubDeviceList/InertialSensor/AccelerometerY/Sensor/Value",
-  "Device/SubDeviceList/InertialSensor/AccelerometerZ/Sensor/Value",
+  "Device/SubDeviceList/InertialSensor/GyrX/Sensor/Value",
+  "Device/SubDeviceList/InertialSensor/GyrY/Sensor/Value",
+  "Device/SubDeviceList/InertialSensor/GyrZ/Sensor/Value",
+  "Device/SubDeviceList/InertialSensor/AccX/Sensor/Value",
+  "Device/SubDeviceList/InertialSensor/AccY/Sensor/Value",
+  "Device/SubDeviceList/InertialSensor/AccZ/Sensor/Value",
   "Device/SubDeviceList/InertialSensor/AngleX/Sensor/Value",
   "Device/SubDeviceList/InertialSensor/AngleY/Sensor/Value",
+  "Device/SubDeviceList/InertialSensor/AngleZ/Sensor/Value",
 
   // sonar sensors
   "Device/SubDeviceList/US/Left/Sensor/Value",

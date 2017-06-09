@@ -117,6 +117,7 @@ enum LBHSensorIds
   accZSensor,
   angleXSensor,
   angleYSensor,
+  angleZSensor,
 
   // sonar sensors
   lUsSensor,

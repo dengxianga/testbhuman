@@ -257,25 +257,25 @@ static int set_actuator_hardnesses(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
-  // std::vector<double> vs = lua_checkvector(L, 1);
-  // std::vector<double> ids = lua_checkvector(L, 2);
+  std::vector<double> vs = lua_checkvector(L, 1);
+  std::vector<double> ids = lua_checkvector(L, 2);
 
-  // for (unsigned int i = 0; i < vs.size(); i++) {
-  //   int bHumanIndex = luaToBHumanPos[(int) ids[i] - 1];
-  //   data->luaBuffer[bHumanIndex + lbhNumOfPositionActuatorIds] = vs[i];
-  // }
-
-  // data->luaNewSet = true;
-
-  std::vector<double> hardness_values = lua_checkvector(L, 1);
-  int startIndex = luaL_checkint(L, 2) - 1;
-  
-  for (int i = startIndex; i < startIndex + hardness_values.size(); i++) {
-    int bHumanIndex = luaToBHumanPos[i];
-    data->luaBuffer[bHumanIndex + lbhNumOfPositionActuatorIds] = hardness_values[i];
+  for (unsigned int i = 0; i < vs.size(); i++) {
+    int bHumanIndex = luaToBHumanPos[(int) ids[i] - 1];
+    data->luaBuffer[bHumanIndex + lbhNumOfPositionActuatorIds] = vs[i];
   }
 
   data->luaNewSet = true;
+
+  // std::vector<double> hardness_values = lua_checkvector(L, 1);
+  // int startIndex = luaL_checkint(L, 2) - 1;
+  
+  // for (int i = startIndex; i < startIndex + hardness_values.size(); i++) {
+  //   int bHumanIndex = luaToBHumanPos[i];
+  //   data->luaBuffer[bHumanIndex + lbhNumOfPositionActuatorIds] = hardness_values[i];
+  // }
+
+  // data->luaNewSet = true;
 
   return 0;
 }
@@ -427,8 +427,6 @@ static int get_sensor_positions(lua_State *L) {
     actuatorSensors[i] = (double) sensors[3*bHumanIndex];
   }
   lua_pushdouble_array(L, (double*) actuatorSensors, (int) nJoint);
-  
-  std::cout<< "get_sensor_positions is being called from bhlowcmd"<< std::endl;
 
   return 1;
 }
@@ -462,8 +460,8 @@ static int get_imu_angle(lua_State *L) {
   }
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
-  double ImuReadings[2] = {(double) sensors[angleXSensor], (double) sensors[angleYSensor]};
-  lua_pushdouble_array(L, ImuReadings, 2);
+  double ImuReadings[3] = {(double) sensors[angleXSensor], (double) sensors[angleYSensor], sensors[angleZSensor]};
+  lua_pushdouble_array(L, ImuReadings, 3);
   return 1;
 }
 
@@ -490,7 +488,7 @@ static int get_imu_gyr(lua_State *L) {
   }
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
-  double GyroReadings[3] = {(double) sensors[gyroXSensor], (double) sensors[gyroYSensor], (double) sensors[gyroZSensor]};
+  double GyroReadings[3] = {(double) sensors[gyroXSensor], (double) sensors[gyroYSensor], (double) -sensors[gyroZSensor]};
   lua_pushdouble_array(L, GyroReadings, 3);
   return 1;
 }
@@ -535,7 +533,8 @@ static int set_actuator_position_forever(lua_State *L) {
       
       
     }
-    float * sensors = data->sensors[data->newestSensors];
+    data->readingSensors = data->newestSensors;
+    float * sensors = data->sensors[data->readingSensors];
     std::cout<<sensors[1] * 1000<< std::endl;
     std::cout<<data->luaNewSet<<std::endl;
   }
@@ -548,7 +547,8 @@ static int get_sensor_current(lua_State *L) {
   int index = luaL_checkint(L, 1) - 1; // convert to zero-indexed
 
   int bHumanIndex = luaToBHumanPos[index];
-  float * sensors = data->sensors[data->newestSensors];
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
   lua_pushnumber(L, (double) 1000 * sensors[3*bHumanIndex+1]);
   return 1;
 }
@@ -578,6 +578,52 @@ static int get_time(lua_State *L) {
   while (!data->newTime) {} // wait for new time
   lua_pushnumber(L, data->dcmTime);
   data->newTime = false;
+  return 1;
+}
+
+static int get_sensor_batteryCharge(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
+
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+  lua_pushnumber(L, sensors[batteryChargeSensor]);
+  return 1;
+}
+
+static int get_sensor_button(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
+
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+  lua_pushnumber(L, sensors[chestButtonSensor]);
+  return 1;
+}
+
+static int get_sensor_bumperLeft(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
+
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+  double bumperReadings[2] = {(double) sensors[lBumperLeftSensor], (double) sensors[lBumperRightSensor]};
+  lua_pushdouble_array(L, bumperReadings, 2);
+  return 1;
+}
+
+static int get_sensor_bumperRight(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
+
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+  double bumperReadings[2] = {(double) sensors[rBumperLeftSensor], (double) sensors[rBumperRightSensor]};
+  lua_pushdouble_array(L, bumperReadings, 2);
   return 1;
 }
 
@@ -614,7 +660,12 @@ static const struct luaL_Reg bhlowcmd_lib [] = {
   {"get_actuator_velocity", get_actuator_velocity},
   // {"set_actuator_joint_imu_angle_x", set_actuator_joint_imu_angle_x},
   // {"set_actuator_joint_imu_angle_y", set_actuator_joint_imu_angle_y},
-  
+
+  {"get_sensor_batteryCharge", get_sensor_batteryCharge},
+  {"get_sensor_button", get_sensor_button},
+  {"get_sensor_bumperLeft", get_sensor_bumperLeft},
+  {"get_sensor_bumperRight", get_sensor_bumperRight},
+
   {NULL, NULL}
 };
 

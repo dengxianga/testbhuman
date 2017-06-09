@@ -1,3 +1,4 @@
+-- For testing original luadcm and Naobody.lua
 cwd = cwd or os.getenv('PWD')
 package.path = cwd.."/?.lua;"..package.path;
 require('init')
@@ -12,8 +13,19 @@ require('dive');
 require('Speak')
 require('util')
 
-Body.set_body_hardness(0);
-while 1 do	
-	local rarm_pos = Body.get_rarm_position();
-	print(unpack(rarm_pos));
+
+local clock = os.clock
+
+function sleep(n)  -- seconds
+  local t0 = clock()
+  while clock() - t0 <= n do end
 end
+
+-- while 1 do	
+-- 	local sensor_gyro = Body.get_sensor_imuAngle();
+-- 	print(unpack(sensor_gyro));
+-- 	sleep(1);
+-- end
+
+local sensor_result = Body.get_sensor_button();
+print(unpack(sensor_result));
