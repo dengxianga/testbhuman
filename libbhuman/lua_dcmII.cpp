@@ -289,7 +289,7 @@ static int set_actuator_position(lua_State *L) {
   int index = luaL_checkint(L, 2) - 1; // convert to zero-indexed
 
   int bHumanIndex = luaToBHumanPos[index];
-  data->luaBuffer[index] = x;
+  data->luaBuffer[bHumanIndex] = x;
 
   data->luaNewSet = true;
 
