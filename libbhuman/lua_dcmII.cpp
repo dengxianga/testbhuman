@@ -628,6 +628,23 @@ static int get_sensor_bumperRight(lua_State *L) {
   return 1;
 }
 
+static int get_sensor_sonarLeft(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
+
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+
+  double sonarSensors[10];
+  std::cout << lUsSensor << endl;
+  for (int i=0; i<10; i++) {
+    sonarSensors[i]=sensors[i+lUsSensor];
+  }
+  lua_pushdouble_array(L, (double*) sonarSensors, 10);
+  return 1;
+}
+
 static const struct luaL_Reg bhlowcmd_lib [] = {
   {"getdummy", luaBH_getdummy},
 
@@ -666,6 +683,7 @@ static const struct luaL_Reg bhlowcmd_lib [] = {
   {"get_sensor_button", get_sensor_button},
   {"get_sensor_bumperLeft", get_sensor_bumperLeft},
   {"get_sensor_bumperRight", get_sensor_bumperRight},
+  {"get_sensor_sonarLeft", get_sensor_sonarLeft},
 
   {NULL, NULL}
 };

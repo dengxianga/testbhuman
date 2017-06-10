@@ -107,15 +107,20 @@ function get_sensor_button()
 	return result;
 end
 
--- function get_sensor_bumperLeft()
--- 	local result = bhlowcmd.get_sensor_bumperLeft();
--- 	return result;
--- end
+function get_sensor_bumperLeft()
+	local result = bhlowcmd.get_sensor_bumperLeft();
+	return result;
+end
 
--- function get_sensor_bumperRight()
--- 	local result = bhlowcmd.get_sensor_bumperRight();
--- 	return result;
--- end
+function get_sensor_bumperRight()
+	local result = bhlowcmd.get_sensor_bumperRight();
+	return result;
+end
+
+function get_sensor_usLeft()
+	local result = bhlowcmd.get_sensor_sonarLeft();
+	return result;
+end
 
 function get_sensor_time(index)
 	local result = bhlowcmd.get_time();

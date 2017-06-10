@@ -38,13 +38,11 @@ function set_actuator_hardnesses_test_2()
 end
 
 function set_head_command_movement_test()
-	--head_target = Body.get_head_position();
-	--head_command = Body.get_head_position();
-	-- set_head_command(0.5);
+	head_target = Body.get_head_position();
+	head_command = Body.get_head_position();
 	Body.set_head_hardness(0.7);
 	
 	Body.update_head_movement();
-	--Body.update_head_movement();
 end
 
 function set_head_hardness_test()
@@ -84,7 +82,8 @@ end
 
 function set_lleg_command_test()
 	set_lleg_hardness_test();
-	Body.set_lleg_command({0.3, 0.5, -1, 1, 0.5, 0.3});
+	Body.set_rleg_hardness(0.5);
+	Body.set_lleg_command({0.3, 0.5, -1, 1, 0.5, 0.3, 0.3, -0.5, -1, 1, 0.5, -0.3});
 end
 
 function set_rleg_command_test()
@@ -107,17 +106,33 @@ function get_battery_level_test()
 	print(Body.get_battery_level());
 end
 
+function get_sensor_bumperLeft_test()
+	print(unpack(Body.get_sensor_bumperLeft()));
+end
+
+function get_sensor_bumperRight_test()
+	print(unpack(Body.get_sensor_bumperRight()))
+end
+
+function get_sensor_button_test()
+	print(Body.get_sensor_button())
+end
+
+function get_sensor_usLeft_test()
+	print(unpack(Body.get_sensor_usLeft()));
+end
+
 ----------- Script -----------
 
 --uncomment below to relax joints in case it's hitting itself
 Body.set_actuator_hardness(vector.zeros(22));
 
---set_lleg_command_test();
---while 1 do
---	get_sensor_imuGyrRPY_test();
---	sleep(1);
---end
+print('starting important stuff')
 
-get_battery_level_test();
+--set_lleg_command_test();
+while 1 do
+	get_sensor_usLeft_test();
+	sleep(1);
+end
 
 print("done!");
