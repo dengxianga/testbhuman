@@ -120,8 +120,6 @@ end
 
 function get_sensor_usLeft_test()
 	print(unpack(Body.get_sensor_usLeft()));
-	-- local sensorInfo = Body.get_sensor_usLeft();
-	-- print(sensorInfo[1]);
 end
 
 function get_sensor_temperature_test()
@@ -131,26 +129,25 @@ function get_sensor_temperature_test()
 	end
 end
 
+function stand_test()
+	local count = 0;
+  set_actuator_hardnesses_test_1();
+  Body.set_rarm_command({1.6, 0, 0, 0});
+  Body.set_larm_command({1.6, 0, 0, 0});
+end
+
 ----------- Script -----------
 
 --uncomment below to relax joints in case it's hitting itself
 Body.set_actuator_hardness(vector.zeros(22));
 
 print('starting important stuff')
-local count = 0;
-set_actuator_hardnesses_test_1();
-Body.set_rarm_command({1.6, 0, 0, 0});
-Body.set_larm_command({1.6, 0, 0, 0});
 
-while 1 do
-	-- if (count % 2 == 0) then
-	-- 	Body.set_rleg_command({0.3, -0.5, -1, 1, -0.5, -0.3});
-	-- else
-	-- 	Body.set_rleg_command({0, 0, 0, 0, 0, 0});
-	-- end
-
-	get_sensor_temperature_test();
-	sleep(1);
+while 1 do	
+  Body.set_actuator_ultraSonic(68);
+	--print(Body.get_sensor_ultraSonic());
+  get_sensor_usLeft_test();
+	--sleep(1);
 end
 
 print("done!");
