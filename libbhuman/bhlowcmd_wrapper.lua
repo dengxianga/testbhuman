@@ -20,10 +20,10 @@ function set_actuator_hardness(values, index)
 	if type(values) == "number" then
 		bhlowcmd.set_actuator_hardness(values, index);
 	else
-		index = index or 0;
+		index = index or 1;
 		local indices = vector.zeros(#values);
 		for i = 1, #values do
-			indices[i] = index + i;
+			indices[i] = index + i - 1;
 		end
 		bhlowcmd.set_actuator_hardnesses(values, indices);
 	end
@@ -43,7 +43,8 @@ function set_actuator_command(values, starting_index)
 	if type(values) == "number" then
 		bhlowcmd.set_actuator_position(values, starting_index);
 	else
-		starting_index = starting_index or 0;
+		starting_index = starting_index or 1;
+		print("lua starting_index:", starting_index)
 		bhlowcmd.set_actuator_command(values, starting_index); 
 	end
 end

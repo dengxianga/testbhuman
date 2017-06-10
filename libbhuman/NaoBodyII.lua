@@ -5,36 +5,29 @@ require('vector');
 require('unix');
 require('util');
 
--- host = "dcm";
-
--- -- Time step in sec
--- tDelta = 0.010;
-
--- -- add gyro0 to dcm
--- gyro0 = { 0, 0, 0} ;
--- if (not util.shm_key_exists(dcm.sensorShm, 'imuGyr0', #gyro0)) then
-
--- 	dcm.sensorShm: set('imuGyr0', gyro0);
--- end
-
--- --Initialize dcm.
--- dcm.init();
-
--- --Copy dcm to local namespace
--- for k,v in pairs(dcm) do
-
--- 	getfenv()[k] = v;
--- end
-
-jointNames = { "HeadYaw", "HeadPitch",
-"LShoulderPitch", "LShoulderRoll",
-"LElbowYaw", "LElbowRoll",
-"LHipYawPitch", "LHipRoll", "LHipPitch",
-"LKneePitch", "LAnklePitch", "LAnkleRoll",
-"RHipYawPitch", "RHipRoll", "RHipPitch",
-"RKneePitch", "RAnklePitch", "RAnkleRoll",
-"RShoulderPitch", "RShoulderRoll",
-"RElbowYaw", "RElbowRoll"} ;
+jointNames = {
+"HeadYaw",
+"HeadPitch",
+"LShoulderPitch", 
+"LShoulderRoll",
+"LElbowYaw", 
+"LElbowRoll",
+"LHipYawPitch", 
+"LHipRoll",
+"LHipPitch",
+"LKneePitch", 
+"LAnklePitch", 
+"LAnkleRoll",
+"RHipYawPitch", 
+"RHipRoll", 
+"RHipPitch",
+"RKneePitch", 
+"RAnklePitch", 
+"RAnkleRoll",
+"RShoulderPitch", 
+"RShoulderRoll",
+"RElbowYaw", 
+"RElbowRoll"} ;
 
 nJoint = #jointNames;
 indexHead = 1;
@@ -48,7 +41,7 @@ nJointRLeg = 6;
 indexRArm = 19;
 nJointRArm = 4;
 
-get_time = function() return get_sensor_time(1); end
+get_time = function() return -get_sensor_time(1); end
 
 --Last commanded joint angles (for standup with broken encoders)
 commanded_joint_angles=vector.zeros(22);
@@ -57,115 +50,221 @@ commanded_joint_angles=vector.zeros(22);
 head_velocity_limit = { 180* math.pi/180, 120* math.pi/180} ;
 tLastUpdate = 0;
 function set_head_command(val)
-head_target = val;
+	head_target = val;
 end
 
 function update_head_movement()
-local t =get_time();
-if tLastUpdate>0 then
-
-	local tDiff = t-tLastUpdate;
-	for i=1,2 do
-
-		local Err = head_target[i]-head_command[i];
-		Err = math.max(-head_velocity_limit[i]* tDiff,
-		math.min(head_velocity_limit[i]* tDiff,Err));
-		head_command[i] = head_command[i]+ Err;
+	local t = get_time();
+	if tLastUpdate>0 then
+		local tDiff = t-tLastUpdate;
+		for i=1,2 do
+			local Err = head_target[i]-head_command[i];
+			Err = math.max(-head_velocity_limit[i]* tDiff,
+			math.min(head_velocity_limit[i]* tDiff,Err));
+			head_command[i] = head_command[i]+ Err;
+		end
+		set_actuator_command(head_command, indexHead);
 	end
-	set_actuator_command(head_command, indexHead);
-end
-tLastUpdate = t;
+	tLastUpdate = t;
 end
 
 function update()
-update_head_movement();
+	update_head_movement();
 end
 
 -- setup convience functions
 function get_head_position()
-local q = get_sensor_position();
-return { unpack(q, indexHead, indexHead+ nJointHead-1)} ;
+	local q = get_sensor_position();
+	return { unpack(q, indexHead, indexHead+ nJointHead-1)} ;
 end
+
 function get_larm_position()
-local q = get_sensor_position();
-return { unpack(q, indexLArm, indexLArm+ nJointLArm-1)} ;
+	local q = get_sensor_position();
+	return { unpack(q, indexLArm, indexLArm+ nJointLArm-1)} ;
 end
+
 function get_rarm_position()
-local q = get_sensor_position();
-return { unpack(q, indexRArm, indexRArm+ nJointRArm-1)} ;
+	local q = get_sensor_position();
+	return { unpack(q, indexRArm, indexRArm+ nJointRArm-1)} ;
 end
+
 function get_lleg_position()
-local q = get_sensor_position();
-return { unpack(q, indexLLeg, indexLLeg+ nJointLLeg-1)} ;
+	local q = get_sensor_position();
+	return { unpack(q, indexLLeg, indexLLeg+ nJointLLeg-1)} ;
 end
+
 function get_rleg_position()
-local q = get_sensor_position();
-return { unpack(q, indexRLeg, indexRLeg+ nJointRLeg-1)} ;
+	local q = get_sensor_position();
+	return { unpack(q, indexRLeg, indexRLeg+ nJointRLeg-1)} ;
 end
 
 function set_body_hardness(val)
-if (type(val) == "number") then
+	if (type(val) == "number") then
+		val = val* vector.ones(nJoint);
+	end
+	set_actuator_hardness(val);
+end
 
-	val = val* vector.ones(nJoint);
-end
-set_actuator_hardness(val);
-end
 function set_head_hardness(val)
-if (type(val) == "number") then
+	if (type(val) == "number") then
+		val = val* vector.ones(nJointHead);
+	end
+	set_actuator_hardness(val, indexHead);
+end
 
-	val = val* vector.ones(nJointHead);
-end
-set_actuator_hardness(val, indexHead);
-end
 function set_larm_hardness(val)
-if (type(val) == "number") then
+	if (type(val) == "number") then
+		val = val* vector.ones(nJointLArm);
+	end
+	set_actuator_hardness(val, indexLArm);
+end
 
-	val = val* vector.ones(nJointLArm);
-end
-set_actuator_hardness(l, indexLArm);
-end
 function set_rarm_hardness(val)
-if (type(val) == "number") then
+	if (type(val) == "number") then
+		val = val* vector.ones(nJointRArm);
+	end
+	set_actuator_hardness(val, indexRArm);
+end
 
-	val = val* vector.ones(nJointRArm);
-end
-set_actuator_hardness(val, indexRArm);
-end
 function set_lleg_hardness(val)
-if (type(val) == "number") then
+	if (type(val) == "number") then
+		val = val* vector.ones(nJointLLeg);
+	end
+	set_actuator_hardness(val, indexLLeg);
+end
 
-	val = val* vector.ones(nJointLLeg);
-end
-set_actuator_hardness(val, indexLLeg);
-end
 function set_rleg_hardness(val)
-if (type(val) == "number") then
+	if (type(val) == "number") then
+		val = val* vector.ones(nJointRLeg);
+	end
+	set_actuator_hardness(val, indexRLeg);
+end
 
-	val = val* vector.ones(nJointRLeg);
-end
-set_actuator_hardness(val, indexRLeg);
-end
 function set_waist_hardness(val)
 end
 
-function set_lleg_command(val)
-set_actuator_command(val, indexLLeg);
-for i=1,#val do
-
-	commanded_joint_angles[6+ i] = val[i];
-end
-end
-function set_rleg_command(val)
-set_actuator_command(val, indexRLeg);
-end
 function set_larm_command(val)
-set_actuator_command(val, indexLArm);
+	set_actuator_command(val, indexLArm);
 end
+
 function set_rarm_command(val)
-set_actuator_command(val, indexRArm);
+	set_actuator_command(val, indexRArm);
 end
+
+function set_lleg_command(val)
+	set_actuator_command(val, indexLLeg);
+	for i=1,#val do
+		commanded_joint_angles[6+ i] = val[i];
+	end
+end
+
+function set_rleg_command(val)
+	set_actuator_command(val, indexRLeg);
+end
+
 function set_waist_command(val)
 end
+
+gyro0 = {0,0,0};
+ccount = -1;
+function calibrate(count)
+	if (ccount == -1) then
+		-- initialize calibration values
+		gyro0sum = { 0, 0} ;
+		gyrocount = 0;
+		gyroMax = { -math.huge, -math.huge} ;
+		gyroMin = { math.huge, math.huge} ;
+		gyroThreshold = 500;
+
+		ccount = ccount +  1;
+		return false;
+
+	else
+		if (ccount < 100) then
+	 
+			imuGyr = get_sensor_imuGyr();
+			gyro0sum[1] = gyro0sum[1] +  imuGyr[1];
+			gyro0sum[2] = gyro0sum[2] +  imuGyr[2];
+			gyroMax[1] = math.max(gyroMax[1], math.abs(imuGyr[1]));
+			gyroMax[2] = math.max(gyroMax[2], math.abs(imuGyr[2]));
+			gyroMin[1] = math.min(gyroMin[1], math.abs(imuGyr[1]));
+			gyroMin[2] = math.min(gyroMin[2], math.abs(imuGyr[2]));
+
+			ccount = ccount +  1;
+			return false;
+
+		else
+			gyroMag = (gyroMax[1]-gyroMin[1])^ 2 +  (gyroMax[2]-gyroMin[2])^ 2;
+
+			print('Gyro max:  ', unpack(gyroMax))
+			print('Gyro min:  ', unpack(gyroMin))
+			print('Gyro mag:  ', gyroMag);
+
+			if (gyroMag > gyroThreshold) then
+
+				print('Recalibrating Gyro')
+				ccount = -1;
+				return false;
+
+			else
+				gyro0[1] = gyro0sum[1]/ccount;
+				gyro0[2] = gyro0sum[2]/ccount;
+				-- dcm.sensorShm: set('imuGyr0', { gyro0[1], gyro0[2], 0.0} );
+				print('Calibration done.');
+				print('gyro0:  ', unpack(gyro0));
+
+				calibrating = false;
+				return true;
+			end
+		end
+	end
+end
+
+--SJ:  normalize gyro values here
+--Value should be Roll-pitch-yaw, in degree per seconds 
+function get_sensor_imuGyrRPY()
+	imuGyrRaw = get_sensor_imuGyr();
+	gyro_roll = -(imuGyrRaw[1]-gyro0[1]);
+	gyro_pitch = -(imuGyrRaw[2]-gyro0[2]);
+	gyrRPY = vector.new({ gyro_roll, gyro_pitch, 0} );
+	return gyrRPY;
+end
+
+function get_battery_level()
+-- 	return the battery level (0-10)
+	charge = get_sensor_batteryCharge();
+	charge = math.ceil(charge *  10);
+	return charge;
+end
+
+function get_change_state()
+	return get_sensor_button()[1];
+end
+
+-- dummy functions
+function set_syncread_enable(val)
+end
+
+function set_lleg_slope(val)
+end
+
+function set_rleg_slope(val)
+end
+
+head_target=get_head_position();
+head_command=get_head_position();
+
+
+--[[
+function 
+for k,v in actuatorShm.next, actuatorShm do
+actuator[k] = carray.cast(actuatorShm: pointer(k));
+getfenv()["set_actuator_"..k] =
+function(val, index)
+return set_actuator_shm(k, val, index);
+end
+end
+--]]
 
 -- --- deprecated no need to implement ---
 -- function set_indicator_state(color)
@@ -363,90 +462,3 @@ end
 -- 	return 0;
 -- end
 -- end
-
-ccount = -1;
-function calibrate(count)
-if (ccount == -1) then
-
-	-- initialize calibration values
-	gyro0sum = { 0, 0} ;
-	gyrocount = 0;
-	gyroMax = { -math.huge, -math.huge} ;
-	gyroMin = { math.huge, math.huge} ;
-	gyroThreshold = 500;
-
-	ccount = ccount +  1;
-	return false;
-
-else
-	if (ccount < 100) then
- 
-		imuGyr = get_sensor_imuGyr();
-		gyro0sum[1] = gyro0sum[1] +  imuGyr[1];
-		gyro0sum[2] = gyro0sum[2] +  imuGyr[2];
-		gyroMax[1] = math.max(gyroMax[1], math.abs(imuGyr[1]));
-		gyroMax[2] = math.max(gyroMax[2], math.abs(imuGyr[2]));
-		gyroMin[1] = math.min(gyroMin[1], math.abs(imuGyr[1]));
-		gyroMin[2] = math.min(gyroMin[2], math.abs(imuGyr[2]));
-
-		ccount = ccount +  1;
-		return false;
-
-	else
-		gyroMag = (gyroMax[1]-gyroMin[1])^ 2 +  (gyroMax[2]-gyroMin[2])^ 2;
-
-		print('Gyro max:  ', unpack(gyroMax))
-		print('Gyro min:  ', unpack(gyroMin))
-		print('Gyro mag:  ', gyroMag);
-
-		if (gyroMag > gyroThreshold) then
-
-			print('Recalibrating Gyro')
-			ccount = -1;
-			return false;
-
-		else
-			gyro0[1] = gyro0sum[1]/ccount;
-			gyro0[2] = gyro0sum[2]/ccount;
-			-- dcm.sensorShm: set('imuGyr0', { gyro0[1], gyro0[2], 0.0} );
-			print('Calibration done.');
-			print('gyro0:  ', unpack(gyro0));
-
-			calibrating = false;
-			return true;
-		end
-	end
-end
-end
-
---SJ:  normalize gyro values here
---Value should be Roll-pitch-yaw, in degree per seconds 
-function get_sensor_imuGyrRPY()
-imuGyrRaw = get_sensor_imuGyr();
-gyro_roll = -(imuGyrRaw[1]-gyro0[1]);
-gyro_pitch = -(imuGyrRaw[2]-gyro0[2]);
-gyrRPY = vector.new({ gyro_roll, gyro_pitch, 0} );
-return gyrRPY;
-end
-
--- dummy functions
-function set_syncread_enable(val)
-end
-function set_lleg_slope(val)
-end
-function set_rleg_slope(val)
-end
-
---[[
-function 
-for k,v in actuatorShm.next, actuatorShm do
-actuator[k] = carray.cast(actuatorShm: pointer(k));
-getfenv()["set_actuator_"..k] =
-function(val, index)
-return set_actuator_shm(k, val, index);
-end
-end
---]]
-
-head_target=get_head_position();
-head_command=get_head_position();

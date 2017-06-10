@@ -357,8 +357,9 @@ static int set_actuator_command(lua_State *L) {
   int startIndex = luaL_checkint(L, 2) - 1;
   
   for (int i = startIndex; i < startIndex + joint_values.size(); i++) {
+    std::cout << "i: " << i << "   joint_values[i]: " << joint_values[i-startIndex] << std::endl;
     int bHumanIndex = luaToBHumanPos[i];
-    data->luaBuffer[bHumanIndex] = joint_values[i];
+    data->luaBuffer[bHumanIndex] = joint_values[i-startIndex];
   }
 
   data->luaNewSet = true;
