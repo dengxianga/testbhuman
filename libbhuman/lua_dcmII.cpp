@@ -645,6 +645,22 @@ static int get_sensor_sonarLeft(lua_State *L) {
   return 1;
 }
 
+static int get_sensor_temperature(lua_State *L) {
+if (!initialized) {
+    lua_initialize();
+  }
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+  double sensorTemperatures[nJoint];
+  for (int i = 0; i < nJoint; i++) {
+    int bHumanIndex = luaToBHumanPos[i];
+    sensorTemperatures[i] = (double) sensors[3 * bHumanIndex + 2];
+  }
+  lua_pushdouble_array(L, (double*) sensorTemperatures, (int) nJoint);
+
+  return 1;
+}
+
 static const struct luaL_Reg bhlowcmd_lib [] = {
   {"getdummy", luaBH_getdummy},
 
@@ -684,6 +700,7 @@ static const struct luaL_Reg bhlowcmd_lib [] = {
   {"get_sensor_bumperLeft", get_sensor_bumperLeft},
   {"get_sensor_bumperRight", get_sensor_bumperRight},
   {"get_sensor_sonarLeft", get_sensor_sonarLeft},
+  {"get_sensor_temperature", get_sensor_temperature},
 
   {NULL, NULL}
 };

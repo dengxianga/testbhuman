@@ -25,17 +25,17 @@ for i=1, 22 do
   all_joints[i] = i;
 end
 
--- Tests function where rarm joints are set, depending on start index and length of values
+-- Tests function where all joints are set, no index is given
 function set_actuator_hardnesses_test_1()
 	print(unpack(all_joints));
-	set_actuator_hardness(vector.ones(22)*0); 
+	set_actuator_hardness(vector.ones(22)); 
 end
 
--- Tests function where all joints are set, no index is given
-function set_actuator_hardnesses_test_2()
-	print(unpack(all_joints));
-	set_actuator_hardness(vector.ones(22)*0); 
-end
+-- -- Tests function where all joints are set, no index is given
+-- function set_actuator_hardnesses_test_2()
+-- 	print(unpack(all_joints));
+-- 	set_actuator_hardness(vector.ones(22)*0); 
+-- end
 
 function set_head_command_movement_test()
 	head_target = Body.get_head_position();
@@ -120,6 +120,15 @@ end
 
 function get_sensor_usLeft_test()
 	print(unpack(Body.get_sensor_usLeft()));
+	-- local sensorInfo = Body.get_sensor_usLeft();
+	-- print(sensorInfo[1]);
+end
+
+function get_sensor_temperature_test()
+	local sensorInfo = Body.get_sensor_temperature();
+	for i = 1, 22 do
+		print(i, sensorInfo[i]);
+	end
 end
 
 ----------- Script -----------
@@ -128,11 +137,21 @@ end
 Body.set_actuator_hardness(vector.zeros(22));
 
 print('starting important stuff')
+local count = 0;
+set_actuator_hardnesses_test_1();
+Body.set_rarm_command({1.6, 0, 0, 0});
+Body.set_larm_command({1.6, 0, 0, 0});
 
---set_lleg_command_test();
 while 1 do
-	get_sensor_usLeft_test();
+	-- if (count % 2 == 0) then
+	-- 	Body.set_rleg_command({0.3, -0.5, -1, 1, -0.5, -0.3});
+	-- else
+	-- 	Body.set_rleg_command({0, 0, 0, 0, 0, 0});
+	-- end
+
+	get_sensor_temperature_test();
 	sleep(1);
+	count = count + 1;
 end
 
 print("done!");

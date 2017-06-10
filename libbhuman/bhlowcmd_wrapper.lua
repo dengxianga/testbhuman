@@ -127,5 +127,8 @@ function get_sensor_time(index)
 	return result;
 end
 
-
+function get_sensor_temperature()
+	local result = bhlowcmd.get_sensor_temperature();
+	return result;
+end
 
