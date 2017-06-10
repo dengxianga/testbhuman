@@ -151,7 +151,6 @@ while 1 do
 
 	get_sensor_temperature_test();
 	sleep(1);
-	count = count + 1;
 end
 
 print("done!");

@@ -132,3 +132,11 @@ function get_sensor_temperature()
 	return result;
 end
 
+function set_actuator_ultraSonic(command)
+	bhlowcmd.set_actuator_ultraSonic(command);
+end
+
+function get_sensor_ultraSonic()
+	local result = bhlowcmd.get_sensor_ultraSonic();
+	return result;
+end

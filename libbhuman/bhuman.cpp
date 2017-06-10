@@ -186,7 +186,9 @@ static const char* sensorNames[] =
   "Device/SubDeviceList/RFoot/FSR/RearLeft/Sensor/Value",
   "Device/SubDeviceList/RFoot/FSR/RearRight/Sensor/Value",
   "Device/SubDeviceList/LFoot/FSR/TotalWeight/Sensor/Value",
-  "Device/SubDeviceList/RFoot/FSR/TotalWeight/Sensor/Value",
+  "Device/SubDeviceList/RFoot/FSR/TotalWeight/Sensor/Value"
+  
+  //"Device/SubDeviceList/US/Sensor/Value"
 };
 
 static const char* actuatorNames[] =
@@ -508,7 +510,7 @@ private:
   void resetUsMeasurements()
   {
     for(int i = lUsSensor; i <= rUs9Sensor; ++i)
-      *sensorPtrs[i] = 0.f;
+      *sensorPtrs[i] = 0.5f;
   }
 
   /**
@@ -790,8 +792,13 @@ private:
 
       float* sensors = data->sensors[writingSensors];
       for(int i = 0; i < lbhNumOfSensorIds; ++i)
-        sensors[i] = *sensorPtrs[i];
-
+        sensors[i] = *sensorPtrs[i]; 
+      
+     // for(int i = lUsSensor; i <= rUs9Sensor; ++i) {
+     //   std::cout << "bhuman.cpp index: " << i << std::endl;
+     //   std::cout << "sensor values" << sensors[i] << std::endl;
+       std::cout << sensorNames[UsSensor] << std::endl;
+     // }
 
       // // ---------------------debug here.............
 
@@ -871,8 +878,11 @@ private:
     // theInstance->set_shm_actuators(data->luaBuffer);
     data->dcmTime = theInstance->dcmTime;
     data->newTime = true;
-    std::cout<<theInstance->dcmTime<<std::endl;
+    //DP commented
+    //std::cout<<theInstance->dcmTime<<std::endl;
     theInstance->setActuators();
+
+    std::cout << actuatorNames[usActuator] << std::endl;
   }
 
   /**

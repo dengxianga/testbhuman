@@ -637,8 +637,8 @@ static int get_sensor_sonarLeft(lua_State *L) {
   float * sensors = data->sensors[data->readingSensors];
 
   double sonarSensors[10];
-  std::cout << lUsSensor << endl;
   for (int i=0; i<10; i++) {
+    //std::cout << "lua_dcmII.cpp index: " << i+lUsSensor << std::endl;
     sonarSensors[i]=sensors[i+lUsSensor];
   }
   lua_pushdouble_array(L, (double*) sonarSensors, 10);
@@ -646,7 +646,7 @@ static int get_sensor_sonarLeft(lua_State *L) {
 }
 
 static int get_sensor_temperature(lua_State *L) {
-if (!initialized) {
+  if (!initialized) {
     lua_initialize();
   }
   data->readingSensors = data->newestSensors;
@@ -658,6 +658,34 @@ if (!initialized) {
   }
   lua_pushdouble_array(L, (double*) sensorTemperatures, (int) nJoint);
 
+  return 1;
+}
+
+static int set_actuator_ultraSonic(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
+
+  int command = luaL_checknumber(L, 1);
+
+  data->luaBuffer[usActuator] = command;
+
+  data->luaNewSet = true;
+
+  return 0;
+}
+
+static int get_sensor_ultraSonic(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
+
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+  
+  cout << "sensors[UsSensor]: " << sensors[UsSensor] << endl;
+  lua_pushnumber(L, sensors[UsSensor]);
+  
   return 1;
 }
 
@@ -702,6 +730,9 @@ static const struct luaL_Reg bhlowcmd_lib [] = {
   {"get_sensor_sonarLeft", get_sensor_sonarLeft},
   {"get_sensor_temperature", get_sensor_temperature},
 
+  {"set_actuator_ultraSonic", set_actuator_ultraSonic},
+  {"get_sensor_ultraSonic", get_sensor_ultraSonic},
+  
   {NULL, NULL}
 };
 

@@ -158,6 +158,8 @@ enum LBHSensorIds
   lFSRTotalSensor,
   rFSRTotalSensor,
 
+  //UsSensor,
+
   lbhNumOfSensorIds,
 };
 
@@ -358,7 +360,7 @@ struct LBHData
   char headId[16]; /* RobotConfig/Head/FullHeadId */
   float sensors[3][lbhNumOfSensorIds];
   float actuators[3][lbhNumOfActuatorIds];
-  float luaBuffer[lbhNumOfActuatorIds * 2];
+  float luaBuffer[lbhNumOfActuatorIds];
   RoboCup::RoboCupGameControlData gameControlData[3];
 
   BHState state;
