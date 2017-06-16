@@ -510,7 +510,7 @@ private:
   void resetUsMeasurements()
   {
     for(int i = lUsSensor; i <= rUs9Sensor; ++i)
-      *sensorPtrs[i] = 0.5f;
+      *sensorPtrs[i] = 0.0f;
   }
 
   /**
@@ -646,7 +646,7 @@ private:
     theInstance->openActuators(actuators);
 
     // buffer[0] = cos(loopcnt*0.01f);
-    for (unsigned int i = 0; i < 2*lbhNumOfActuatorIds; i++) {
+    for (unsigned int i = 0; i < lbhNumOfActuatorIds; i++) {
       actuators[i] = buffer[i];
     }
 
@@ -695,14 +695,14 @@ private:
 
 
 
-      if(state != standing)
-      {
-        if(frameDrops > 0 || state == shuttingDown)
-          setEyeLeds(actuators);
-        else
-          copyNonServos(readingActuators, actuators);
-      }
-      setBatteryLeds(actuators);
+      // if(state != standing)
+      // {
+      //   if(frameDrops > 0 || state == shuttingDown)
+      //     setEyeLeds(actuators);
+      //   else
+      //     copyNonServos(readingActuators, actuators);
+      // }
+      // setBatteryLeds(actuators);
 
       // set position actuators
       positionRequest[4][0] = dcmTime; // 0 delay!
@@ -739,7 +739,7 @@ private:
       }
 
       // set led
-      if(!requestedStiffness && !requestedUs)
+       if(!requestedStiffness && !requestedUs)
         for(int i = 0; i < lbhNumOfLedActuatorIds; ++i)
         {
           int index = faceLedRedLeft0DegActuator + ledIndex;
@@ -797,7 +797,7 @@ private:
      // for(int i = lUsSensor; i <= rUs9Sensor; ++i) {
      //   std::cout << "bhuman.cpp index: " << i << std::endl;
      //   std::cout << "sensor values" << sensors[i] << std::endl;
-       std::cout << sensorNames[UsSensor] << std::endl;
+       // std::cout << sensorNames[UsSensor] << std::endl;
      // }
 
       // // ---------------------debug here.............
@@ -865,24 +865,20 @@ private:
     //theInstance->set_shm_actuators();
 
     //--------------end of test
-    // data->luaNewSet = true;
-    // std::cout<< "luaNewSet: "<< data->luaNewSet <<std::endl;
+
     if (data->luaNewSet) {
       theInstance->set_shm_actuators(data->luaBuffer);
       data->luaNewSet = false;
-
-      // std::cout<< "lua buffer: "<<data->luaBuffer[0];
-      // std::cout<< "  data->actuators[1]: "<< data->actuators[data->newestActuators][0]<<std::endl;
     }
 
     // theInstance->set_shm_actuators(data->luaBuffer);
-    data->dcmTime = theInstance->dcmTime;
-    data->newTime = true;
+    // data->dcmTime = theInstance->dcmTime;
+    // data->newTime = true;
     //DP commented
     //std::cout<<theInstance->dcmTime<<std::endl;
     theInstance->setActuators();
 
-    std::cout << actuatorNames[usActuator] << std::endl;
+    // std::cout << actuatorNames[rFootLedRedActuator]<< actuatorNames[rFootLedGreenActuator] << actuatorNames[rFootLedBlueActuator]<< std::endl;
   }
 
   /**

@@ -122,6 +122,10 @@ function get_sensor_usLeft_test()
 	print(unpack(Body.get_sensor_usLeft()));
 end
 
+function get_sensor_usRight_test()
+	print(unpack(Body.get_sensor_usRight()));
+end
+
 function get_sensor_temperature_test()
 	local sensorInfo = Body.get_sensor_temperature();
 	for i = 1, 22 do
@@ -136,18 +140,73 @@ function stand_test()
   Body.set_larm_command({1.6, 0, 0, 0});
 end
 
+function get_sensor_fsrLeft_test() 
+	local sensorInfo = Body.get_sensor_fsrLeft();
+	print(unpack(sensorInfo));
+end 
+
+function get_sensor_fsrRight_test() 
+	local sensorInfo = Body.get_sensor_fsrRight();
+	print(unpack(sensorInfo));
+end 
+
+function get_time_test()
+  local time = Body.get_time();
+  print(time);
+end
+
+function set_actuator_ledFoot_test()
+	local blue = {0, 0, 1};
+	local green = {0, 1, 0};
+	local red = {1, 0, 0};
+	local white = {1, 1, 1};
+	local off = {0, 0, 0};
+	local yellow = {1, 1, 0};
+	local cyan = {0, 1, 1};
+	local purple = {1, 0, 1};
+	Body.set_actuator_ledFootLeft(off);
+	-- set_actuator_ledFootRight(purple);
+end
+
+function set_actuator_ledEars_test(charge)
+	local command = vector.ones(10);
+	local i = 0;
+	while (i < 10-charge) do
+		command[i] = 0;
+		i = i + 1;
+	end
+	Body.set_actuator_ledEarsRight(command);
+end
+
+function set_actuator_ledEars_forever_test()
+	local count = 0;
+	while 1 do
+		charge = count % 10;
+		Body.set_actuator_ledEars_test(charge);
+		count = count + 1;
+		sleep(1);
+	end
+end
+
+function set_actuator_ledFace_test() 
+	local white = vector.ones(24);
+	local one_color = vector.ones(8);
+	Body.set_actuator_ledFaceLeft(one_color, 7);
+	Body.set_actuator_ledFaceRight(one_color, 17);
+end
+
 ----------- Script -----------
 
 --uncomment below to relax joints in case it's hitting itself
-Body.set_actuator_hardness(vector.zeros(22));
+-- Body.set_actuator_hardness(vector.zeros(22));
 
-print('starting important stuff')
-
-while 1 do	
-  Body.set_actuator_ultraSonic(68);
-	--print(Body.get_sensor_ultraSonic());
-  get_sensor_usLeft_test();
-	--sleep(1);
-end
+local sensorinfo = Body.get_sensor_temperature();
+print(unpack(Body.get_sensor_temperature()))
+-- while 1 do	
+  
+-- 	--print(Body.get_sensor_ultraSonic());
+-- 	-- get_time_test();
+-- 	sleep(1);
+-- end
 
 print("done!");

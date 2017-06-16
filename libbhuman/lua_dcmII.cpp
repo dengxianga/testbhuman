@@ -6,6 +6,7 @@
 #include <sys/resource.h>
 #include <ctime>
 #include <cstring>
+#include <sys/time.h>
 
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -357,7 +358,7 @@ static int set_actuator_command(lua_State *L) {
   int startIndex = luaL_checkint(L, 2) - 1;
   
   for (int i = startIndex; i < startIndex + joint_values.size(); i++) {
-    std::cout << "i: " << i << "   joint_values[i]: " << joint_values[i-startIndex] << std::endl;
+    // std::cout << "i: " << i << "   joint_values[i]: " << joint_values[i-startIndex] << std::endl;
     int bHumanIndex = luaToBHumanPos[i];
     data->luaBuffer[bHumanIndex] = joint_values[i-startIndex];
   }
@@ -545,12 +546,23 @@ static int get_sensor_current(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
-  int index = luaL_checkint(L, 1) - 1; // convert to zero-indexed
+  // int index = luaL_checkint(L, 1) - 1; // convert to zero-indexed
 
-  int bHumanIndex = luaToBHumanPos[index];
+  // int bHumanIndex = luaToBHumanPos[index];
+  // data->readingSensors = data->newestSensors;
+  // float * sensors = data->sensors[data->readingSensors];
+  // lua_pushnumber(L, (double) 1000 * sensors[3*bHumanIndex+1]);
+  // return 1;
+
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
-  lua_pushnumber(L, (double) 1000 * sensors[3*bHumanIndex+1]);
+
+  double sensorTemperatures[nJoint];
+  for (int i = 0; i < nJoint; i++) {
+    int bHumanIndex = luaToBHumanPos[i];
+    sensorCurrents[i] = (double) sensors[3 * bHumanIndex + 1];
+  }
+  lua_pushdouble_array(L, (double*) sensorCurrents, (int) nJoint);
   return 1;
 }
 
@@ -576,9 +588,15 @@ static int get_time(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
-  while (!data->newTime) {} // wait for new time
-  lua_pushnumber(L, data->dcmTime);
-  data->newTime = false;
+  // //while (!data->newTime) {} // wait for new time
+  // lua_pushnumber(L, data->dcmTime);
+  // // data->newTime = false;
+
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  double t = tv.tv_sec + 1E-6*tv.tv_usec;
+
+  lua_pushnumber(L, t);
   return 1;
 }
 
@@ -645,12 +663,30 @@ static int get_sensor_sonarLeft(lua_State *L) {
   return 1;
 }
 
+static int get_sensor_sonarRight(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
+
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+
+  double sonarSensors[10];
+  for (int i=0; i<10; i++) {
+    sonarSensors[i]=sensors[i+rUsSensor];
+  }
+  lua_pushdouble_array(L, (double*) sonarSensors, 10);
+  return 1;
+}
+
 static int get_sensor_temperature(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
+
   double sensorTemperatures[nJoint];
   for (int i = 0; i < nJoint; i++) {
     int bHumanIndex = luaToBHumanPos[i];
@@ -669,25 +705,180 @@ static int set_actuator_ultraSonic(lua_State *L) {
   int command = luaL_checknumber(L, 1);
 
   data->luaBuffer[usActuator] = command;
-
   data->luaNewSet = true;
 
   return 0;
 }
 
-static int get_sensor_ultraSonic(lua_State *L) {
+static int get_sensor_fsrLeft(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
 
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
+  double fsrSensors[4] = {(double) sensors[lFSRFrontLeftSensor], (double) sensors[lFSRRearLeftSensor], (double) sensors[lFSRFrontRightSensor], (double) sensors[lFSRRearRightSensor]};
   
-  cout << "sensors[UsSensor]: " << sensors[UsSensor] << endl;
-  lua_pushnumber(L, sensors[UsSensor]);
-  
+  lua_pushdouble_array(L, fsrSensors, 4);
   return 1;
 }
+
+static int get_sensor_fsrRight(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
+
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+  double fsrSensors[4] = {(double) sensors[rFSRFrontLeftSensor], (double) sensors[rFSRRearLeftSensor], (double) sensors[rFSRFrontRightSensor], (double) sensors[rFSRRearRightSensor]};
+  
+  lua_pushdouble_array(L, fsrSensors, 4);
+  return 1;
+}
+
+// static int get_sensor_ultraSonic(lua_State *L) {
+//   if (!initialized) {
+//     lua_initialize();
+//   }
+
+//   data->readingSensors = data->newestSensors;
+//   float * sensors = data->sensors[data->readingSensors];
+  
+//   cout << "sensors[UsSensor]: " << sensors[UsSensor] << endl;
+//   lua_pushnumber(L, sensors[UsSensor]);
+  
+//   return 1;
+// }
+
+static int set_actuator_ledFootLeft(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
+  std::vector<double> values = lua_checkvector(L, 1);
+
+  std::cout<< "Left red:" << data->actuators[data->newestActuators][lFootLedRedActuator] << std::endl; 
+  std::cout<< "Left green:" << data->actuators[data->newestActuators][lFootLedGreenActuator] << std::endl;  
+  std::cout<< "Left blue:" << data->actuators[data->newestActuators][lFootLedBlueActuator] << std::endl; 
+
+  std::cout<< "Buffer Left red:" << data->luaBuffer[lFootLedRedActuator] << std::endl; 
+  std::cout<< "Buffer Left green:" << data->luaBuffer[lFootLedGreenActuator] << std::endl;  
+  std::cout<< "Buffer Left blue:" << data->luaBuffer[lFootLedBlueActuator] << std::endl;     
+  for (unsigned int i = 0; i < 3; i++) {
+    std::cout<<"l " << i << "   "<< values[i] << std::endl;
+    data->luaBuffer[i + lFootLedRedActuator] = values[i];
+  }
+
+  data->luaNewSet = true;
+  return 0;
+}
+
+static int set_actuator_ledFootRight(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
+  std::vector<double> values = lua_checkvector(L, 1);
+
+  for (unsigned int i = 0; i < 3; i++) {
+    // std::cout<<"l " << i << "   "<< values[i] << std::endl;
+    data->luaBuffer[i + rFootLedRedActuator] = values[i];
+  }
+
+  data->luaNewSet = true;
+  return 0;
+}
+
+static int set_actuator_ledEarsLeft(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
+  std::vector<double> values = lua_checkvector(L, 1);
+
+  for (unsigned int i = 0; i < 10; i++) {
+    // std::cout<<"l " << i << "   "<< values[i] << std::endl;
+    data->luaBuffer[i + earsLedLeft0DegActuator] = values[i];
+  }
+
+  data->luaNewSet = true;
+  return 0;
+}
+
+static int set_actuator_ledEarsRight(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
+  std::vector<double> values = lua_checkvector(L, 1);
+
+  for (unsigned int i = 0; i < 10; i++) {
+    // std::cout<<"l " << i << "   "<< values[i] << std::endl;
+    data->luaBuffer[i + earsLedRight0DegActuator] = values[i];
+  }
+
+  data->luaNewSet = true;
+  return 0;
+}
+
+static int set_actuator_ledFaceLeft(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
+  std::vector<double> values = lua_checkvector(L, 1);
+  int index = luaL_checkint(L, 2) - 1;
+
+  for (unsigned int i = 0; i < values.size(); i++) {
+    // std::cout<<"l " << i << "   "<< values[i] << std::endl;
+    data->luaBuffer[i + faceLedRedLeft0DegActuator + index] = values[i];
+  }
+
+  data->luaNewSet = true;
+  return 0;
+}
+
+static int set_actuator_ledFaceRight(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
+  std::vector<double> values = lua_checkvector(L, 1);
+  int index = luaL_checkint(L, 2) - 1;
+
+  for (unsigned int i = 0; i < values.size(); i++) {
+    // std::cout<<"l " << i << "   "<< values[i] << std::endl;
+    data->luaBuffer[i + faceLedRedRight0DegActuator + index] = values[i];
+  }
+
+  data->luaNewSet = true;
+  return 0;
+}
+
+static int set_actuator_ledChest(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
+  std::vector<double> values = lua_checkvector(L, 1);
+
+  for (unsigned int i = 0; i < 3; i++) {
+    // std::cout<<"l " << i << "   "<< values[i] << std::endl;
+    data->luaBuffer[i + chestBoardLedRedActuator] = values[i];
+  }
+
+  data->luaNewSet = true;
+  return 0;
+}
+
+static int set_actuator_ledHead(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
+  std::vector<double> values = lua_checkvector(L, 1);
+
+  for (unsigned int i = 0; i < values.size(); i++) {
+    // std::cout<<"l " << i << "   "<< values[i] << std::endl;
+    data->luaBuffer[i + headLedRearLeft0Actuator] = values[i];
+  }
+
+  data->luaNewSet = true;
+  return 0;
+}
+
 
 static const struct luaL_Reg bhlowcmd_lib [] = {
   {"getdummy", luaBH_getdummy},
@@ -728,10 +919,23 @@ static const struct luaL_Reg bhlowcmd_lib [] = {
   {"get_sensor_bumperLeft", get_sensor_bumperLeft},
   {"get_sensor_bumperRight", get_sensor_bumperRight},
   {"get_sensor_sonarLeft", get_sensor_sonarLeft},
+  {"get_sensor_sonarRight", get_sensor_sonarRight},
   {"get_sensor_temperature", get_sensor_temperature},
 
   {"set_actuator_ultraSonic", set_actuator_ultraSonic},
-  {"get_sensor_ultraSonic", get_sensor_ultraSonic},
+
+  {"get_sensor_fsrLeft", get_sensor_fsrLeft},
+  {"get_sensor_fsrRight", get_sensor_fsrRight},
+  // {"get_sensor_ultraSonic", get_sensor_ultraSonic},
+
+  {"set_actuator_ledFootLeft", set_actuator_ledFootLeft},
+  {"set_actuator_ledFootRight", set_actuator_ledFootRight},
+  {"set_actuator_ledEarsLeft", set_actuator_ledEarsLeft},
+  {"set_actuator_ledEarsRight", set_actuator_ledEarsRight},
+  {"set_actuator_ledFaceLeft", set_actuator_ledFaceLeft},
+  {"set_actuator_ledFaceRight", set_actuator_ledFaceRight},
+  {"set_actuator_ledChest", set_actuator_ledChest},
+  {"set_actuator_ledHead", set_actuator_ledHead},
   
   {NULL, NULL}
 };

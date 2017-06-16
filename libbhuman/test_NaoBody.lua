@@ -39,7 +39,7 @@ end
 -- Tests function where rarm joints are set, depending on start index and length of values
 function set_actuator_hardnesses_test_1()
 	print(unpack(all_joints));
-	set_actuator_hardness(vector.ones(22)*0); 
+	set_actuator_hardnesses(vector.ones(22)*0); 
 end
 
 -- Tests function where all joints are set, no index is given
@@ -126,32 +126,66 @@ function get_battery_level_test()
 end
 
 function get_sensor_bumperLeft_test()
-  print(unpack(Body.get_sensor_bumperLeft()));
+	print(unpack(Body.get_sensor_bumperLeft()));
 end
 
 function get_sensor_bumperRight_test()
-  print(unpack(Body.get_sensor_bumperRight()))
+	print(unpack(Body.get_sensor_bumperRight()))
 end
 
 function get_sensor_button_test()
-  print(Body.get_sensor_button()[1])
+	print(Body.get_sensor_button())
 end
 
 function get_sensor_usLeft_test()
-  print(unpack(Body.get_sensor_usLeft()));
+	print(unpack(Body.get_sensor_usLeft()));
 end
 
+function get_sensor_usRight_test()
+	print(unpack(Body.get_sensor_usRight()));
+end
+
+function get_sensor_temperature_test()
+	local sensorInfo = Body.get_sensor_temperature();
+	for i = 1, 22 do
+		print(i, sensorInfo[i]);
+	end
+end
+
+function stand_test()
+	local count = 0;
+  set_actuator_hardnesses_test_1();
+  Body.set_rarm_command({1.6, 0, 0, 0});
+  Body.set_larm_command({1.6, 0, 0, 0});
+end
+
+function get_sensor_fsrLeft_test() 
+	local sensorInfo = Body.get_sensor_fsrLeft();
+	print(unpack(sensorInfo));
+end 
+
+function get_sensor_fsrRight_test() 
+	local sensorInfo = Body.get_sensor_fsrRight();
+	print(unpack(sensorInfo));
+end 
+
+function get_time_test()
+  local time = Body.get_time();
+  print(time);
+end
 ----------- Script -----------
 
 --uncomment below to relax joints in case it's hitting itself
-Body.set_actuator_hardness(vector.zeros(22));
+-- Body.set_actuator_hardness(vector.zeros(22));
 
-print('starting important stuff')
-
---set_lleg_command_test();
-while 1 do
-  get_sensor_usLeft_test();
-  sleep(1);
+-- print('starting important stuff')
+-- Body.set_actuator_us(68);
+-- stand_test();
+while 1 do	
+  
+	--print(Body.get_sensor_ultraSonic());
+	get_time_test();
+	sleep(1);
 end
 
 print("done!");

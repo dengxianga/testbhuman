@@ -41,7 +41,7 @@ nJointRLeg = 6;
 indexRArm = 19;
 nJointRArm = 4;
 
-get_time = function() return -get_sensor_time(1); end
+get_time = function() return get_sensor_time(); end
 
 --Last commanded joint angles (for standup with broken encoders)
 commanded_joint_angles=vector.zeros(22);
@@ -238,7 +238,7 @@ function get_battery_level()
 end
 
 function get_change_state()
-	return get_sensor_button()[1];
+	return get_sensor_button();
 end
 
 -- dummy functions
@@ -266,199 +266,185 @@ end
 end
 --]]
 
--- --- deprecated no need to implement ---
--- function set_indicator_state(color)
--- set_actuator_ledChest(color)
--- end
 
--- --- deprecated no need to implement ---
--- function set_indicator_team(teamColor)
--- if (teamColor == 1) then
+function set_indicator_state(color)
+set_actuator_ledChest(color)
+end
 
--- 	set_actuator_ledFootLeft({ 1, 0, 0} );
--- else
--- 	set_actuator_ledFootLeft({ 0, 0, 1} );
--- end
--- end
 
--- --- deprecated no need to implement ---
--- function set_indicator_kickoff(kickoff)
--- if (kickoff == 1) then
+function set_indicator_team(teamColor)
+	if (teamColor == 1) then
 
--- 	set_actuator_ledFootRight({ 1, 1, 1} );
--- else
--- 	set_actuator_ledFootRight({ 0, 0, 0} );
--- end
--- end
+		set_actuator_ledFootLeft({ 1, 0, 0} );
+	else
+		set_actuator_ledFootLeft({ 0, 0, 1} );
+	end
+end
 
--- --- deprecated no need to implement ---
--- function set_indicator_batteryLevel(level)
--- led = vector.ones(10);
--- i = 1;
--- while (i < 10-charge) do
 
--- 	led[i] = 0;
--- 	i = i+ 1;
--- end
+function set_indicator_kickoff(kickoff)
+if (kickoff == 1) then
 
--- set_actuator_ledEarsRight(led);
--- end
+	set_actuator_ledFootRight({ 1, 1, 1} );
+else
+	set_actuator_ledFootRight({ 0, 0, 0} );
+end
+end
 
--- --- deprecated no need to implement ---
--- function set_indicator_role(role, wireless)
--- wireless = wireless or false
--- -- attacker
--- if role == 1 then
 
--- 	if wireless then
+function set_indicator_batteryLevel(level)
+led = vector.ones(10);
+i = 1;
+while (i < 10-charge) do
 
--- 		set_actuator_ledEarsLeft({ 1, 1, 1, 0, 0, 0, 1, 1, 1, 0} );
--- 	else
--- 		set_actuator_ledFaceRight(vector.ones(8), 17);
--- 	end
+	led[i] = 0;
+	i = i+ 1;
+end
 
--- -- defender
--- elseif role == 2 or role == 4 then
+set_actuator_ledEarsRight(led);
+end
 
--- 	if wireless then
 
--- 		set_actuator_ledEarsLeft({ 0, 0, 0, 0, 1, 1, 1, 1, 1, 0} );
--- 	else
--- 		--set_actuator_ledFaceRight(vector.ones(8), 1);
--- 	end
+function set_indicator_role(role, wireless)
+wireless = wireless or false
+-- attacker
+if role == 1 then
 
--- -- support
--- elseif role == 3 then
+	if wireless then
 
--- 	if wireless then
+		set_actuator_ledEarsLeft({ 1, 1, 1, 0, 0, 0, 1, 1, 1, 0} );
+	else
+		set_actuator_ledFaceRight(vector.ones(8), 17);
+	end
 
--- 		set_actuator_ledEarsLeft({ 1, 0, 0, 0, 0, 0, 0, 1, 1, 1} );
--- 	else
--- 		--set_actuator_ledFaceRight(vector.ones(8), 17);
--- 	end
--- -- goalie
--- elseif role == 0 then
--- 	set_actuator_ledEarsLeft({ 0, 0, 0, 0, 1, 1, 1, 0, 0, 0} );
--- elseif role == 5 then
+-- defender
+elseif role == 2 or role == 4 then
 
--- 	-- lost player
--- 	set_actuator_ledEarsLeft({ 1, 0, 0, 1, 0, 0, 1, 0, 0, 0} );
--- else
--- 	-- unkown role
--- 	set_actuator_ledEarsLeft({ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} );
--- end
--- end
+	if wireless then
 
--- --- deprecated no need to implement ---
--- function set_indicator_ball(color)
--- -- color is a 3 element vector
--- -- convention is all zero indicates no detection
+		set_actuator_ledEarsLeft({ 0, 0, 0, 0, 1, 1, 1, 1, 1, 0} );
+	else
+		set_actuator_ledFaceRight(vector.ones(8), 1);
+	end
+
+-- support
+elseif role == 3 then
+
+	if wireless then
+
+		set_actuator_ledEarsLeft({ 1, 0, 0, 0, 0, 0, 0, 1, 1, 1} );
+	else
+		set_actuator_ledFaceRight(vector.ones(8), 17);
+	end
+-- goalie
+elseif role == 0 then
+	set_actuator_ledEarsLeft({ 0, 0, 0, 0, 1, 1, 1, 0, 0, 0} );
+elseif role == 5 then
+
+	-- lost player
+	set_actuator_ledEarsLeft({ 1, 0, 0, 1, 0, 0, 1, 0, 0, 0} );
+else
+	-- unkown role
+	set_actuator_ledEarsLeft({ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} );
+end
+end
+
+function set_indicator_ball(color)
+-- color is a 3 element vector
+-- convention is all zero indicates no detection
+if (color[1] == 1 and color[2] == 0 and color[3] == 0) then
+	Body.set_actuator_ledFaceLeft(vector.ones(8), 1)
+
+elseif (color[1] == 0 and color[2] == 1 and color[3] == 0) then
+  Body.set_actuator_ledFaceLeft(vector.ones(8), 9)
+
+elseif (color[1] == 0 and color[2] == 1 and color[3] == 1) then
+
+	-- -- yellow (DOESNT MATCH COLOR, TEMPORARY)
+	set_actuator_ledFaceLeft(vector.zeros(24));
+	set_actuator_ledFaceLeft(vector.ones(8), 9);
+
+else
+	Body.set_actuator_ledFaceRight(vector.zeros(24));
+end
+end
+
+
+
+function set_indicator_goal(color)
+-- color is a 3 element vector
+-- convention is all zero indicates no detection
+if (color[1] == 1 and color[2] == 1 and color[3] == 0) then
+
+	-- yellow
+	set_actuator_ledFaceLeft(vector.zeros(24));
+	set_actuator_ledFaceLeft(vector.ones(8), 9);
+elseif (color[1] == 0 and color[2] == 0 and color[3] == 1) then
+
+	-- cyan 
+	set_actuator_ledFaceLeft(vector.zeros(24));
+	set_actuator_ledFaceLeft(vector.ones(8), 17);
+else
+	set_actuator_ledFaceLeft(vector.zeros(24));
+end
+end
+
+function set_indicator_test(vector, color)
+-- color is a 3 element vector
+-- convention is all zero indicates no detection
+
+Body.set_actuator_ledFaceLeft(vector, color)
+
+
 -- if (color[1] == 1 and color[2] == 0 and color[3] == 0) then
--- 	Body.set_actuator_ledFaceLeft(vector.ones(8), 1)
 
--- elseif (color[1] == 0 and color[2] == 1 and color[3] == 0) then
---   Body.set_actuator_ledFaceLeft(vector.ones(8), 9)
+-- 	Body.set_actuator_ledFaceRight(vector.ones(8), 1);
 
 -- elseif (color[1] == 0 and color[2] == 1 and color[3] == 1) then
-
--- 	-- yellow (DOESNT MATCH COLOR, TEMPORARY)
 -- 	set_actuator_ledFaceLeft(vector.zeros(24));
 -- 	set_actuator_ledFaceLeft(vector.ones(8), 9);
 
 -- else
 -- 	Body.set_actuator_ledFaceRight(vector.zeros(24));
 -- end
--- end
+end
+
+function get_change_enable()
+return 0;
+end
 
 
---- deprecated no need to implement ---
--- function set_indicator_goal(color)
--- -- color is a 3 element vector
--- -- convention is all zero indicates no detection
--- if (color[1] == 1 and color[2] == 1 and color[3] == 0) then
+function get_change_team()
+bumperLeft = get_sensor_bumperLeft();
+if (bumperLeft[1] == 1 and bumperLeft[2] == 1) then
 
--- 	-- yellow
--- 	set_actuator_ledFaceLeft(vector.zeros(24));
--- 	set_actuator_ledFaceLeft(vector.ones(8), 9);
--- elseif (color[1] == 0 and color[2] == 0 and color[3] == 1) then
-
--- 	-- cyan 
--- 	set_actuator_ledFaceLeft(vector.zeros(24));
--- 	set_actuator_ledFaceLeft(vector.ones(8), 17);
--- else
--- 	set_actuator_ledFaceLeft(vector.zeros(24));
--- end
--- end
-
--- --- deprecated no need to implement ---
--- function set_indicator_test(vector, color)
--- -- color is a 3 element vector
--- -- convention is all zero indicates no detection
-
--- Body.set_actuator_ledFaceLeft(vector, color)
+	return 1;
+else
+	return 0;
+end
+end
 
 
--- -- if (color[1] == 1 and color[2] == 0 and color[3] == 0) then
+function get_change_role()
+bumperLeft = get_sensor_bumperLeft();
+bumperRight = get_sensor_bumperRight();
 
--- -- 	Body.set_actuator_ledFaceRight(vector.ones(8), 1);
+if (bumperLeft[1]+ bumperLeft[2]+ 
+	bumperRight[1]+ bumperRight[2])>0 then
 
--- -- elseif (color[1] == 0 and color[2] == 1 and color[3] == 1) then
--- -- 	set_actuator_ledFaceLeft(vector.zeros(24));
--- -- 	set_actuator_ledFaceLeft(vector.ones(8), 9);
-
--- -- else
--- -- 	Body.set_actuator_ledFaceRight(vector.zeros(24));
--- -- end
--- end
+	return 1;
+else
+	return 0;
+end
+end
 
 
--- function get_battery_level()
--- -- return the battery level (0-10)
--- charge = get_sensor_batteryCharge();
--- charge = math.ceil(charge[1] *  10);
--- return charge;
--- end
+function get_change_kickoff()
+bumperRight = get_sensor_bumperRight();
+if (bumperRight[1] == 1 and bumperRight[2] == 1) then
 
--- function get_change_state()
--- return get_sensor_button()[1];
--- end
-
--- function get_change_enable()
--- return 0;
--- end
-
--- --- deprecated no need to implement ---
--- function get_change_team()
--- bumperLeft = get_sensor_bumperLeft();
--- if (bumperLeft[1] == 1 and bumperLeft[2] == 1) then
-
--- 	return 1;
--- else
--- 	return 0;
--- end
--- end
-
--- --- deprecated no need to implement ---
--- function get_change_role()
--- bumperLeft = get_sensor_bumperLeft();
--- bumperRight = get_sensor_bumperRight();
-
--- if (bumperLeft[1]+ bumperLeft[2]+ 
--- 	bumperRight[1]+ bumperRight[2])>0 then
-
--- 	return 1;
--- else
--- 	return 0;
--- end
--- end
-
--- --- deprecated no need to implement ---
--- function get_change_kickoff()
--- bumperRight = get_sensor_bumperRight();
--- if (bumperRight[1] == 1 and bumperRight[2] == 1) then
-
--- 	return 1;
--- else
--- 	return 0;
--- end
--- end
+	return 1;
+else
+	return 0;
+end
+end
