@@ -7,6 +7,7 @@
 #include <ctime>
 #include <cstring>
 #include <sys/time.h>
+#include <cmath>
 
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -240,6 +241,9 @@ static int set_actuator_positions(lua_State *L) {
   // closeActuators();
   //////////
 
+	//data->readingSensors = data->newestSensors;
+  //float * sensors = data->sensors[data->newestSensors];
+
   //////// control with luawrapper, buffer
   for (unsigned int i = 0; i < vs.size(); i++) {
     int bHumanIndex = luaToBHumanPos[(int) ids[i] - 1];
@@ -261,13 +265,27 @@ static int set_actuator_hardnesses(lua_State *L) {
   std::vector<double> vs = lua_checkvector(L, 1);
   std::vector<double> ids = lua_checkvector(L, 2);
 
+	//data->readingSensors = data->newestSensors;
+  //float * sensors = data->sensors[data->newestSensors];
+
+	//data->readingActuators = data->newestActuators;
+	//float * actuators = data->actuators[data->readingActuators];
+
+	//float epsilon = 0.1;
+
   for (unsigned int i = 0; i < vs.size(); i++) {
     int bHumanIndex = luaToBHumanPos[(int) ids[i] - 1];
+	//	if (abs(sensors[bHumanIndex*3] - actuators[bHumanIndex])>epsilon) {
+	//		std::cout << "in hardnesses" << std::endl;
+	//		data->luaBuffer[bHumanIndex] = sensors[bHumanIndex*3];
+	//	}
+
     data->luaBuffer[bHumanIndex + lbhNumOfPositionActuatorIds] = vs[i];
   }
 
   data->luaNewSet = true;
 
+	// not DP FL
   // std::vector<double> hardness_values = lua_checkvector(L, 1);
   // int startIndex = luaL_checkint(L, 2) - 1;
   
@@ -289,6 +307,9 @@ static int set_actuator_position(lua_State *L) {
   double x = luaL_checknumber(L, 1);
   int index = luaL_checkint(L, 2) - 1; // convert to zero-indexed
 
+	//data->readingSensors = data->newestSensors;
+  //float * sensors = data->sensors[data->newestSensors];
+
   int bHumanIndex = luaToBHumanPos[index];
   data->luaBuffer[bHumanIndex] = x;
 
@@ -297,16 +318,89 @@ static int set_actuator_position(lua_State *L) {
   return 0;
 }
 
+static int set_actuator_positions_adjust(lua_State *L) {
+	if (!initialized) {
+		lua_initialize();
+	}
+	
+  std::vector<double> ids = lua_checkvector(L, 1);
+
+	data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->newestSensors];
+	
+	data->readingActuators = data->newestActuators;
+  float * actuators = data->actuators[data->readingActuators];
+
+	float scale = 0.1;
+
+  for (unsigned int i = 0; i < ids.size(); i++) {
+    int bHumanIndex = luaToBHumanPos[(int) ids[i] - 1];
+		double error = actuators[bHumanIndex] - sensors[bHumanIndex*3];
+		data->luaBuffer[bHumanIndex] = actuators[bHumanIndex] + scale*error;
+	}
+
+  data->luaNewSet = true;
+	
+	return 0;
+}
+
+static int set_actuator_command_adjust(lua_State *L) {
+	if (!initialized) {
+		lua_initialize();
+	}
+	
+	int startIndex = luaL_checkint(L, 1) - 1;
+  int numActuators;
+
+  switch (startIndex) {
+    case indexHead: numActuators = nJointHead; break;
+    case indexLArm: numActuators = nJointLArm; break;
+    case indexLLeg: numActuators = nJointLLeg; break;
+    case indexRLeg: numActuators = nJointRLeg; break;
+    case indexRArm: numActuators = nJointRArm; break;
+  }
+
+	data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->newestSensors];
+	
+	data->readingActuators = data->newestActuators;
+  float * actuators = data->actuators[data->readingActuators];
+
+	float scale = 0.1;
+
+  for (unsigned int i = 0; i < numActuators; i++) {
+    int bHumanIndex = luaToBHumanPos[i + startIndex];
+		double error = actuators[bHumanIndex] - sensors[bHumanIndex*3];
+		data->luaBuffer[bHumanIndex] = actuators[bHumanIndex] + scale*error;
+	}
+
+  data->luaNewSet = true;
+	
+	return 0;
+}
+
 static int set_actuator_hardness(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
   
-  double x = luaL_checknumber(L, 1);
+  double hardnessVal = luaL_checknumber(L, 1);
   int index = luaL_checkint(L, 2) - 1; // convert to zero-indexed
-  
-  int bHumanIndex = luaToBHumanPos[index];
-  data->luaBuffer[bHumanIndex + lbhNumOfPositionActuatorIds] = x;
+ 	int bHumanIndex = luaToBHumanPos[index];
+
+	//data->readingSensors = data->newestSensors;
+	//float * sensors = data->sensors[data->readingSensors];
+	
+	//data->readingActuators = data->newestActuators;
+	//float * actuators = data->actuators[data->readingActuators];
+
+//	float epsilon = 0.1;
+//	if (abs(sensors[bHumanIndex*3] - actuators[bHumanIndex])>epsilon) {
+//		std::cout << "in here" << std::endl;
+//		data->luaBuffer[bHumanIndex] = sensors[bHumanIndex*3];
+//	}
+
+  data->luaBuffer[bHumanIndex + lbhNumOfPositionActuatorIds] = hardnessVal;
 
   data->luaNewSet = true;
 
@@ -328,6 +422,27 @@ static int get_actuator_position(lua_State *L) {
   lua_pushnumber(L, (double) actuators[bHumanIndex]);
   return 1;
 }
+
+/**
+ ** Returns actuator command for all positions
+ **/
+static int get_actuator_positions(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
+  data->readingActuators = data->newestActuators;
+  float * actuators = data->actuators[data->readingActuators];
+
+	double actuatorPositions[nJoint];
+	for (int i = 0; i < nJoint; i++) {
+		int bHumanIndex = luaToBHumanPos[i];
+		actuatorPositions[i] = (double) actuators[bHumanIndex];
+	}
+    lua_pushdouble_array(L, (double*) actuatorPositions, (int) nJoint);
+  return 1;
+}
+
+
 
 /**
  ** Returns actuator command for hardsness
@@ -390,7 +505,7 @@ static int get_actuator_command(lua_State *L) {
 
   data->readingActuators = data->newestActuators;
   float * actuators = data->actuators[data->newestActuators];
-  double actuatorCommands[nJoint];
+  double actuatorCommands[numActuators];
   for (int i = 0; i < numActuators; i++) {
     int bHumanIndex = luaToBHumanPos[i];
     actuatorCommands[i] = (double) actuators[bHumanIndex];
@@ -557,7 +672,7 @@ static int get_sensor_current(lua_State *L) {
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
 
-  double sensorTemperatures[nJoint];
+  double sensorCurrents[nJoint];
   for (int i = 0; i < nJoint; i++) {
     int bHumanIndex = luaToBHumanPos[i];
     sensorCurrents[i] = (double) sensors[3 * bHumanIndex + 1];
@@ -886,9 +1001,12 @@ static const struct luaL_Reg bhlowcmd_lib [] = {
   {"set_actuator_hardnesses", set_actuator_hardnesses},
   {"set_actuator_positions", set_actuator_positions},
   {"set_actuator_position", set_actuator_position},
+	{"set_actuator_positions_adjust", set_actuator_positions_adjust},
+	{"set_actuator_command_adjust", set_actuator_command_adjust},
   {"set_actuator_hardness", set_actuator_hardness},  
 
-  {"get_actuator_position", get_actuator_position},
+  {"get_actuator_position",  get_actuator_position},
+	{"get_actuator_positions", get_actuator_positions},
   {"get_actuator_hardness", get_actuator_hardness},
 
   {"set_actuator_command", set_actuator_command},
