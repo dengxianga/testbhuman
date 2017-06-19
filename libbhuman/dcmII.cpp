@@ -481,9 +481,8 @@ static void get_imu_gyr(float* in_out_buffer, float& size) {
 /**
  ** Returns whether the data->luaNewSet flag is on
  **/
-static int get_flag(bool& flag) {
+static void get_flag(bool& flag) {
   flag = data->luaNewSet;
-  return 0;
 }
 
 /**
@@ -523,7 +522,7 @@ static void set_actuator_position_forever(std::vector<double> ids, std::vector<d
   }
 }
 
-static int get_sensor_current(float* in_out_buffer, float& size) {
+static void get_sensor_current(float* in_out_buffer, float& size) {
   if (!initialized) {
     lua_initialize();
   }
