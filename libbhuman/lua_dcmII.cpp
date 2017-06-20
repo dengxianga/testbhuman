@@ -34,7 +34,6 @@
 #include "bhuman.h"
 using namespace std;
 double speed = 0.01;
-double current_time = 0;
 
 enum jointNames { 
 HeadYaw = 0, 
