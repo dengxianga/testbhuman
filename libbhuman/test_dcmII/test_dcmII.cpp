@@ -1,4 +1,4 @@
-#include "lua_dcmII.h"
+#include "dcmII.h"
 #include <iostream>
 
 int main() {
