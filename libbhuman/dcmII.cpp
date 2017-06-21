@@ -146,9 +146,9 @@ void DcmII::get_actuator_positions(float* in_out_buffer, float& size) {
   }
   size = nJoint;
 
-  // for (int i=0; i<size; i++) {
-  //   cout<<actuatorPositions[i]<<endl;
-  // }
+  for (int i=0; i<size; i++) {
+    cout<<actuatorPositions[i]<<endl;
+  }
 
   memcpy(in_out_buffer, actuatorPositions, sizeof(actuatorPositions));
 }

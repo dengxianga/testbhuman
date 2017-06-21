@@ -678,19 +678,19 @@ private:
       // ---------------------debug here..............
 
       actuators = readingActuators; // TODO: this is a hack for now, set actuators by brute force
-      // if (canprint){
-      //   std::cout<<"state "<<state<<std::endl;
-      //   std::cout<< "readingActuators  set  ";
-      //   for(int i = 0; i < lbhNumOfPositionActuatorIds; ++i){
-      //       std::cout<<readingActuators[i]<<" ";
-      //   }
-      //   std::cout<<std::endl;
-      //   std::cout<< "Actuators  set  ";
-      //   for(int i = 0; i < lbhNumOfPositionActuatorIds; ++i){
-      //       std::cout<<actuators[i]<<" ";
-      //   }
-      //   std::cout<<std::endl;
-      // }
+      if (canprint){
+        std::cout<<"state "<<state<<std::endl;
+        std::cout<< "readingActuators  set  ";
+        for(int i = 0; i < lbhNumOfPositionActuatorIds; ++i){
+            std::cout<<readingActuators[i]<<" ";
+        }
+        std::cout<<std::endl;
+        std::cout<< "Actuators  set  ";
+        for(int i = 0; i < lbhNumOfPositionActuatorIds; ++i){
+            std::cout<<actuators[i]<<" ";
+        }
+        std::cout<<std::endl;
+      }
       //////////////////////////////////////////////////
 
 
