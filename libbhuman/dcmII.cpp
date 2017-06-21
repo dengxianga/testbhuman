@@ -69,13 +69,9 @@ int writingActuators = -1;
 
 DcmII::DcmII() {}
 
-// int DcmII::testfunction() {
-// 	return 779997;
-// }
-
-// int testfunction() {
-// 	return 99779;
-// }
+int DcmII::testfunction() {
+	return 779997;
+}
 
 void DcmII::lua_initialize() {
   fd = shm_open(LBH_MEM_NAME, O_RDWR, S_IRUSR | S_IWUSR);
@@ -83,37 +79,31 @@ void DcmII::lua_initialize() {
   initialized = true;
 }
 
-// static void lua_initialize () {
-//   fd = shm_open(LBH_MEM_NAME, O_RDWR, S_IRUSR | S_IWUSR);
-//   data = (LBHData*)mmap(NULL, sizeof(LBHData), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-//   initialized = true;
-// }
+void DcmII::set_actuator_positions(float* vs, int* ids, int size) {
+  if (!initialized) {
+    lua_initialize();
+  }
 
-// static void set_actuator_positions(std::vector<double> vs, std::vector<double> ids) {
-//   if (!initialized) {
-//     lua_initialize();
-//   }
-//   //////// control with luawrapper, buffer
-//   for (unsigned int i = 0; i < vs.size(); i++) {
-//     int bHumanIndex = luaToBHumanPos[(int) ids[i] - 1];
-//     data->luaBuffer[bHumanIndex] = vs[i];
-//   }
+  for (unsigned int i = 0; i < size; i++) {
+    int bHumanIndex = luaToBHumanPos[ids[i]];
+    data->luaBuffer[bHumanIndex] = vs[i];
+  }
 
-//   data->luaNewSet = true;
-// }
+  data->luaNewSet = true;
+}
 
-// static void set_actuator_hardnesses(std::vector<double> vs, std::vector<double> ids) {
-//   if (!initialized) {
-//     lua_initialize();
-//   }
+void DcmII::set_actuator_hardnesses(float* vs, int* ids, int size) {
+  if (!initialized) {
+    lua_initialize();
+  }
 
-//   for (unsigned int i = 0; i < vs.size(); i++) {
-//     int bHumanIndex = luaToBHumanPos[(int) ids[i] - 1];
-//     data->luaBuffer[bHumanIndex + lbhNumOfPositionActuatorIds] = vs[i];
-//   }
+  for (unsigned int i = 0; i < size; i++) {
+    int bHumanIndex = luaToBHumanPos[ids[i]];
+    data->luaBuffer[bHumanIndex + lbhNumOfPositionActuatorIds] = vs[i];
+  }
 
-//   data->luaNewSet = true;
-// }
+  data->luaNewSet = true;
+}
 
 // static void set_actuator_position(double x, int ind) {
 //   if (!initialized) {
@@ -131,7 +121,6 @@ void DcmII::lua_initialize() {
 /**
  ** Returns actuator command for all positions
  **/
-
 void DcmII::get_actuator_positions(float* in_out_buffer, float& size) {
   if (!initialized) {
     lua_initialize();
@@ -146,29 +135,8 @@ void DcmII::get_actuator_positions(float* in_out_buffer, float& size) {
   }
   size = nJoint;
 
-  for (int i=0; i<size; i++) {
-    cout<<actuatorPositions[i]<<endl;
-  }
-
   memcpy(in_out_buffer, actuatorPositions, sizeof(actuatorPositions));
 }
-
-
-// static void get_actuator_positions(float* in_out_buffer, float& size) {
-//   if (!initialized) {
-//     lua_initialize();
-//   }
-//   data->readingActuators = data->newestActuators;
-//   float * actuators = data->actuators[data->readingActuators];
-// 
-//   double actuatorPositions[nJoint];
-//   for (int i = 0; i < nJoint; i++) {
-//     int bHumanIndex = luaToBHumanPos[i];
-//     actuatorPositions[i] = (double) actuators[bHumanIndex];
-//   }
-//   size = nJoint;
-//   memcpy(in_out_buffer, actuatorPositions, sizeof(actuatorPositions));
-// }
 
 // static void set_actuator_hardness(double x, int ind) {
 //   if (!initialized) {
@@ -285,88 +253,82 @@ void DcmII::get_actuator_positions(float* in_out_buffer, float& size) {
 // /**
 //  ** Returns all joint positions read by sensors
 //  **/
-// static void get_sensor_positions(float* in_out_buffer, float& size) {  
-//   if (!initialized) {
-//     lua_initialize();
-//   }
-//   data->readingSensors = data->newestSensors;
-//   float * sensors = data->sensors[data->newestSensors];
-//   float actuatorSensors[nJoint];
-//   for (int i = 0; i < nJoint; i++) {
-//     int bHumanIndex = luaToBHumanPos[i];
-//     actuatorSensors[i] = (double) sensors[3*bHumanIndex];
-//   }
+void DcmII::get_sensor_positions(float* in_out_buffer, float& size) {  
+  if (!initialized) {
+    lua_initialize();
+  }
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->newestSensors];
+  float actuatorSensors[nJoint];
+  for (int i = 0; i < nJoint; i++) {
+    int bHumanIndex = luaToBHumanPos[i];
+    actuatorSensors[i] = (double) sensors[3*bHumanIndex];
+  }
 
-//   size = nJoint;
-//   memcpy(in_out_buffer, actuatorSensors, sizeof(actuatorSensors));
-// }
+  size = nJoint;
+  memcpy(in_out_buffer, actuatorSensors, sizeof(actuatorSensors));
+}
 
 // /**
 //  ** Returns all set joint hardness values
 //  **/
-// static void get_actuator_hardnesses(float* in_out_buffer, float& size) {
-//   if (!initialized) {
-//     lua_initialize();
-//   }
-//   data->readingActuators = data->newestActuators;
-//   float * actuators = data->actuators[data->readingActuators];
-//   double actuatorHardnesses[nJoint];
-//   for (int i = 0; i < nJoint; i++) {
-//     int bHumanIndex = luaToBHumanPos[i];
-//     actuatorHardnesses[i] = (double) actuators[bHumanIndex +lbhNumOfPositionActuatorIds];
-//   }
-//   size = nJoint;
-//   memcpy(in_out_buffer, actuatorHardnesses, sizeof(actuatorHardnesses));
-// }
+void DcmII::get_actuator_hardnesses(float* in_out_buffer, float& size) {
+  if (!initialized) {
+    lua_initialize();
+  }
+  data->readingActuators = data->newestActuators;
+  float * actuators = data->actuators[data->readingActuators];
+  float actuatorHardnesses[nJoint];
+  for (int i = 0; i < nJoint; i++) {
+    int bHumanIndex = luaToBHumanPos[i];
+    actuatorHardnesses[i] = actuators[bHumanIndex + lbhNumOfPositionActuatorIds];
+  }
+  size = nJoint;
+  memcpy(in_out_buffer, actuatorHardnesses, sizeof(actuatorHardnesses));
+}
 
-// /**
-//  ** Returns IMU angle readings 
-//  **/
-// static void get_imu_angle(float* in_out_buffer, float& size) {
-//   if (!initialized) {
-//     lua_initialize();
-//   }
-//   data->readingSensors = data->newestSensors;
-//   float * sensors = data->sensors[data->readingSensors];
-//   double ImuReadings[3] = {(double) sensors[angleXSensor], (double) sensors[angleYSensor], sensors[angleZSensor]};
-//   size = nJoint;
-//   memcpy(in_out_buffer, ImuReadings, sizeof(ImuReadings));
-// }
+/**
+ ** Returns IMU angle readings 
+ **/
+void DcmII::get_imu_angle(float* in_out_buffer, float& size) {
+  if (!initialized) {
+    lua_initialize();
+  }
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+  float ImuReadings[3] = {sensors[angleXSensor], sensors[angleYSensor], sensors[angleZSensor]};
+  size = 3;
+  memcpy(in_out_buffer, ImuReadings, sizeof(ImuReadings));
+}
 
-// /**
-//  ** Returns IMU acc readings 
-//  **/
-// static void get_imu_acc(float* in_out_buffer, float& size) {
-//   if (!initialized) {
-//     lua_initialize();
-//   }
-//   data->readingSensors = data->newestSensors;
-//   float * sensors = data->sensors[data->readingSensors];
-//   double AccReadings[3] = {(double) sensors[accXSensor], (double) sensors[accYSensor], (double) sensors[accZSensor]};
-//   size = nJoint;
-//   memcpy(in_out_buffer, AccReadings, sizeof(AccReadings));
-// }
+/**
+ ** Returns IMU acc readings 
+ **/
+void DcmII::get_imu_acc(float* in_out_buffer, float& size) {
+  if (!initialized) {
+    lua_initialize();
+  }
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+  float AccReadings[3] = {sensors[accXSensor], sensors[accYSensor], sensors[accZSensor]};
+  size = 3;
+  memcpy(in_out_buffer, AccReadings, sizeof(AccReadings));
+}
 
-// /**
-//  ** Returns IMU gyro readings 
-//  **/
-// static void get_imu_gyr(float* in_out_buffer, float& size) {
-//   if (!initialized) {
-//     lua_initialize();
-//   }
-//   data->readingSensors = data->newestSensors;
-//   float * sensors = data->sensors[data->readingSensors];
-//   double GyroReadings[3] = {(double) sensors[gyroXSensor], (double) sensors[gyroYSensor], (double) -sensors[gyroZSensor]};
-//   size = nJoint;
-//   memcpy(in_out_buffer, GyroReadings, sizeof(GyroReadings));
-// }
+/**
+ ** Returns IMU gyro readings 
+ **/
+void DcmII::get_imu_gyr(float* in_out_buffer, float& size) {
+  if (!initialized) {
+    lua_initialize();
+  }
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+  double GyroReadings[3] = {sensors[gyroXSensor], sensors[gyroYSensor], -sensors[gyroZSensor]};
+  size = 3;
+  memcpy(in_out_buffer, GyroReadings, sizeof(GyroReadings));
+}
 
-// /**
-//  ** Returns whether the data->luaNewSet flag is on
-//  **/
-// static void get_flag(bool& flag) {
-//   flag = data->luaNewSet;
-// }
 
 // /**
 //  ** Use CPP to set motion
@@ -400,22 +362,23 @@ void DcmII::get_actuator_positions(float* in_out_buffer, float& size) {
 //   }
 // }
 
-// static void get_sensor_current(float* in_out_buffer, float& size) {
-//   if (!initialized) {
-//     lua_initialize();
-//   }
+void DcmII::get_sensor_current(float* in_out_buffer, float& size) {
+  if (!initialized) {
+    lua_initialize();
+  }
 
-//   data->readingSensors = data->newestSensors;
-//   float * sensors = data->sensors[data->readingSensors];
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
 
-//   double sensorCurrents[nJoint];
-//   for (int i = 0; i < nJoint; i++) {
-//     int bHumanIndex = luaToBHumanPos[i];
-//     sensorCurrents[i] = (double) sensors[3 * bHumanIndex + 1];
-//   }
-//   size = nJoint;
-//   memcpy(in_out_buffer, sensorCurrents, sizeof(sensorCurrents));
-// }
+  float sensorCurrents[nJoint];
+  for (int i = 0; i < nJoint; i++) {
+    int bHumanIndex = luaToBHumanPos[i];
+    sensorCurrents[i] = sensors[3 * bHumanIndex + 1];
+  }
+
+  size = nJoint;
+  memcpy(in_out_buffer, sensorCurrents, sizeof(sensorCurrents));
+}
 
 // static void set_actuator_velocity() {
 //   if (!initialized) {
@@ -430,138 +393,149 @@ void DcmII::get_actuator_positions(float* in_out_buffer, float& size) {
 //   value = 0;
 // }
 
-// static void get_time(float& time) {
-//   if (!initialized) {
-//     lua_initialize();
-//   }
+void DcmII::get_time(float& time) {
+  if (!initialized) {
+    lua_initialize();
+  }
 
-//   struct timeval tv;
-//   gettimeofday(&tv, NULL);
-//   double t = tv.tv_sec + 1E-6*tv.tv_usec;
-//   time = (float) t;
-// }
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  double t = tv.tv_sec + 1E-6*tv.tv_usec;
+  time = (float) t;
+}
 
-// static void get_sensor_batteryCharge(float& value) {
-//   if (!initialized) {
-//     lua_initialize();
-//   }
+void DcmII::get_sensor_batteryCharge(float& value) {
+  if (!initialized) {
+    lua_initialize();
+  }
 
-//   data->readingSensors = data->newestSensors;
-//   float * sensors = data->sensors[data->readingSensors];
-//   value = sensors[batteryChargeSensor];
-// }
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+  value = sensors[batteryChargeSensor];
+}
 
-// static void get_sensor_button(float& value) {
-//   if (!initialized) {
-//     lua_initialize();
-//   }
+void DcmII::get_sensor_button(float& value) {
+  if (!initialized) {
+    lua_initialize();
+  }
 
-//   data->readingSensors = data->newestSensors;
-//   float * sensors = data->sensors[data->readingSensors];
-//   value = sensors[chestButtonSensor];
-// }
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+  value = sensors[chestButtonSensor];
+}
 
-// static void get_sensor_bumperLeft(float* in_out_buffer, float& size) {
-//   if (!initialized) {
-//     lua_initialize();
-//   }
+void DcmII::get_sensor_bumperLeft(float* in_out_buffer, float& size) {
+  if (!initialized) {
+    lua_initialize();
+  }
 
-//   data->readingSensors = data->newestSensors;
-//   float * sensors = data->sensors[data->readingSensors];
-//   float bumperReadings[2] = {sensors[lBumperLeftSensor], sensors[lBumperRightSensor]};
-//   memcpy(in_out_buffer, bumperReadings, sizeof(bumperReadings));
-// }
-
-// static void get_sensor_bumperRight(float* in_out_buffer, float& size) {
-//   if (!initialized) {
-//     lua_initialize();
-//   }
-
-//   data->readingSensors = data->newestSensors;
-//   float * sensors = data->sensors[data->readingSensors];
-//   double bumperReadings[2] = {(double) sensors[rBumperLeftSensor], (double) sensors[rBumperRightSensor]};
-//   memcpy(in_out_buffer, bumperReadings, sizeof(bumperReadings));
-// }
-
-// static void get_sensor_sonarLeft(float* in_out_buffer, float& size) {
-//   if (!initialized) {
-//     lua_initialize();
-//   }
-
-//   data->readingSensors = data->newestSensors;
-//   float * sensors = data->sensors[data->readingSensors];
-
-//   double sonarSensors[10];
-//   for (int i=0; i<10; i++) {
-//     //std::cout << "lua_dcmII.cpp index: " << i+lUsSensor << std::endl;
-//     sonarSensors[i]=sensors[i+lUsSensor];
-//   }
-//   memcpy(in_out_buffer, sonarSensors, sizeof(sonarSensors));
-// }
-
-// static void get_sensor_sonarRight(float* in_out_buffer, float& size) {
-//   if (!initialized) {
-//     lua_initialize();
-//   }
-
-//   data->readingSensors = data->newestSensors;
-//   float * sensors = data->sensors[data->readingSensors];
-
-//   double sonarSensors[10];
-//   for (int i=0; i<10; i++) {
-//     sonarSensors[i]=sensors[i+rUsSensor];
-//   }
-//   memcpy(in_out_buffer, sonarSensors, sizeof(sonarSensors));
-// }
-
-// static void get_sensor_temperature(float* in_out_buffer, float& size) {
-//   if (!initialized) {
-//     lua_initialize();
-//   }
-
-//   data->readingSensors = data->newestSensors;
-//   float * sensors = data->sensors[data->readingSensors];
-
-//   double sensorTemperatures[nJoint];
-//   for (int i = 0; i < nJoint; i++) {
-//     int bHumanIndex = luaToBHumanPos[i];
-//     sensorTemperatures[i] = (double) sensors[3 * bHumanIndex + 2];
-//   }
-//   memcpy(in_out_buffer, sensorTemperatures, sizeof(sensorTemperatures));
-// }
-
-// static void set_actuator_ultraSonic(int command) {
-//   if (!initialized) {
-//     lua_initialize();
-//   }
-
-//   data->luaBuffer[usActuator] = command;
-//   data->luaNewSet = true;
-// }
-
-// static void get_sensor_fsrLeft(float* in_out_buffer, float& size) {
-//   if (!initialized) {
-//     lua_initialize();
-//   }
-
-//   data->readingSensors = data->newestSensors;
-//   float * sensors = data->sensors[data->readingSensors];
-//   double fsrSensors[4] = {(double) sensors[lFSRFrontLeftSensor], (double) sensors[lFSRRearLeftSensor], (double) sensors[lFSRFrontRightSensor], (double) sensors[lFSRRearRightSensor]};
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+  float bumperReadings[2] = {sensors[lBumperLeftSensor], sensors[lBumperRightSensor]};
   
-//   memcpy(in_out_buffer, fsrSensors, sizeof(fsrSensors));
-// }
+  size = 2;
+  memcpy(in_out_buffer, bumperReadings, sizeof(bumperReadings));
+}
 
-// static void get_sensor_fsrRight(float* in_out_buffer, float& size) {
-//   if (!initialized) {
-//     lua_initialize();
-//   }
+void DcmII::get_sensor_bumperRight(float* in_out_buffer, float& size) {
+  if (!initialized) {
+    lua_initialize();
+  }
 
-//   data->readingSensors = data->newestSensors;
-//   float * sensors = data->sensors[data->readingSensors];
-//   double fsrSensors[4] = {(double) sensors[rFSRFrontLeftSensor], (double) sensors[rFSRRearLeftSensor], (double) sensors[rFSRFrontRightSensor], (double) sensors[rFSRRearRightSensor]};
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+  float bumperReadings[2] = {(double) sensors[rBumperLeftSensor], (double) sensors[rBumperRightSensor]};
   
-//   memcpy(in_out_buffer, fsrSensors, sizeof(fsrSensors));
-// }
+  size = 2;
+  memcpy(in_out_buffer, bumperReadings, sizeof(bumperReadings));
+}
+
+void DcmII::get_sensor_sonarLeft(float* in_out_buffer, float& size) {
+  if (!initialized) {
+    lua_initialize();
+  }
+
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+
+  float sonarSensors[10];
+  for (int i=0; i<10; i++) {
+    sonarSensors[i]=sensors[i+lUsSensor];
+  }
+
+  size = 10;
+  memcpy(in_out_buffer, sonarSensors, sizeof(sonarSensors));
+}
+
+void DcmII::get_sensor_sonarRight(float* in_out_buffer, float& size) {
+  if (!initialized) {
+    lua_initialize();
+  }
+
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+
+  float sonarSensors[10];
+  for (int i=0; i<10; i++) {
+    sonarSensors[i]=sensors[i+rUsSensor];
+  }
+
+  size = 10;
+  memcpy(in_out_buffer, sonarSensors, sizeof(sonarSensors));
+}
+
+void DcmII::get_sensor_temperature(float* in_out_buffer, float& size) {
+  if (!initialized) {
+    lua_initialize();
+  }
+
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+
+  float sensorTemperatures[nJoint];
+  for (int i = 0; i < nJoint; i++) {
+    int bHumanIndex = luaToBHumanPos[i];
+    sensorTemperatures[i] = sensors[3 * bHumanIndex + 2];
+  }
+
+  size = nJoint;
+  memcpy(in_out_buffer, sensorTemperatures, sizeof(sensorTemperatures));
+}
+
+void DcmII::set_actuator_ultraSonic(int command) {
+  if (!initialized) {
+    lua_initialize();
+  }
+
+  data->luaBuffer[usActuator] = command;
+  data->luaNewSet = true;
+}
+
+void DcmII::get_sensor_fsrLeft(float* in_out_buffer, float& size) {
+  if (!initialized) {
+    lua_initialize();
+  }
+
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+  float fsrSensors[4] = {sensors[lFSRFrontLeftSensor], sensors[lFSRRearLeftSensor], sensors[lFSRFrontRightSensor], (double) sensors[lFSRRearRightSensor]};
+  
+  size = 4;
+  memcpy(in_out_buffer, fsrSensors, sizeof(fsrSensors));
+}
+
+void DcmII::get_sensor_fsrRight(float* in_out_buffer, float& size) {
+  if (!initialized) {
+    lua_initialize();
+  }
+
+  data->readingSensors = data->newestSensors;
+  float * sensors = data->sensors[data->readingSensors];
+  float fsrSensors[4] = {sensors[rFSRFrontLeftSensor], sensors[rFSRRearLeftSensor], sensors[rFSRFrontRightSensor], (double) sensors[rFSRRearRightSensor]};
+  
+  size = 4;
+  memcpy(in_out_buffer, fsrSensors, sizeof(fsrSensors));
+}
 
 // static void set_actuator_ledFootLeft(std::vector<double> values) {
 //   if (!initialized) {

@@ -8,6 +8,7 @@
 #include <cstring>
 #include <sys/time.h>
 #include <sys/stat.h>
+#include <vector>
 
 //#ifdef __clang__
 //#pragma clang diagnostic push
@@ -41,15 +42,30 @@ class DcmII {
 		DcmII();
 		int testfunction();
 		void get_actuator_positions(float* in_out_buffer, float& size);
+	    void set_actuator_positions(float* vs, int* ids, int size);
+	    void set_actuator_hardnesses(float* vs, int* ids, int size);
+	    void get_actuator_hardnesses(float* in_out_buffer, float& size);
+	    void get_sensor_positions(float* in_out_buffer, float& size);
+	    void get_imu_angle(float* in_out_buffer, float& size);
+	    void get_imu_acc(float* in_out_buffer, float& size);
+	    void get_imu_gyr(float* in_out_buffer, float& size);
+	    void get_time(float& time);
+		void get_sensor_batteryCharge(float& value);
+		void get_sensor_button(float& value);
+		void get_sensor_bumperLeft(float* in_out_buffer, float& size);
+		void get_sensor_bumperRight(float* in_out_buffer, float& size);
+		void set_actuator_ultraSonic(int command);
+		void get_sensor_sonarLeft(float* in_out_buffer, float& size);
+		void get_sensor_sonarRight(float* in_out_buffer, float& size);
+		void get_sensor_temperature(float* in_out_buffer, float& size);
+		void get_sensor_current(float* in_out_buffer, float& size);
+		void get_sensor_fsrLeft(float* in_out_buffer, float& size);
+		void get_sensor_fsrRight(float* in_out_buffer, float& size);
+
 };
 
-// static void set_actuator_positions(std::vector<double> vs, std::vector<double> ids);
-
-// static void set_actuator_hardnesses(std::vector<double> vs, std::vector<double> ids);
 
 // static void set_actuator_position(double x, int ind);
-
-// static void get_actuator_positions(float* in_out_buffer, float& size);
 
 // static void set_actuator_hardness(double x, int ind);
 
@@ -63,47 +79,11 @@ class DcmII {
 
 // static void get_sensor_position(float& value, int ind);
 
-// static void get_sensor_positions(float* in_out_buffer, float& size);
-
-// static void get_actuator_hardnesses(float* in_out_buffer, float& size);
-
-// static void get_imu_angle(float* in_out_buffer, float& size);
-
-// static void get_imu_acc(float* in_out_buffer, float& size);
-
-// static void get_imu_gyr(float* in_out_buffer, float& size);
-
-// static void get_flag(bool& flag);
-
 // static void set_actuator_position_forever(std::vector<double> ids, std::vector<double> vs);
-
-// static void get_sensor_current(float* in_out_buffer, float& size);
 
 // static void set_actuator_velocity();
 
 // static void get_actuator_velocity(float& value);
-
-// static void get_time(float& time);
-
-// static void get_sensor_batteryCharge(float& value);
-
-// static void get_sensor_button(float& value);
-
-// static void get_sensor_bumperLeft(float* in_out_buffer, float& size);
-
-// static void get_sensor_bumperRight(float* in_out_buffer, float& size);
-
-// static void get_sensor_sonarLeft(float* in_out_buffer, float& size);
-
-// static void get_sensor_sonarRight(float* in_out_buffer, float& size);
-
-// static void get_sensor_temperature(float* in_out_buffer, float& size);
-
-// static void set_actuator_ultraSonic(int command);
-
-// static void get_sensor_fsrLeft(float* in_out_buffer, float& size);
-
-// static void get_sensor_fsrRight(float* in_out_buffer, float& size);
 
 // static void set_actuator_ledFootLeft(std::vector<double> values);
 
