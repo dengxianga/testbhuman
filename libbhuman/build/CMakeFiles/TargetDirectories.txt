@@ -1,0 +1,2 @@
+/home/nao/testbhuman/libbhuman/build/CMakeFiles/bhuman.dir
+/home/nao/testbhuman/libbhuman/build/CMakeFiles/dcmII.dir

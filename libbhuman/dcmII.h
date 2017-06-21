@@ -7,31 +7,41 @@
 #include <ctime>
 #include <cstring>
 #include <sys/time.h>
+#include <sys/stat.h>
 
-#ifdef __clang__
-#pragma clang diagnostic push
-
-#pragma clang diagnostic ignored "-Wunknown-pragmas"
-#pragma clang diagnostic ignored "-Wconversion"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-local-typedef"
-#endif
-#define BOOST_SIGNALS_NO_DEPRECATION_WARNING
-#include <alcommon/albroker.h>
-#include <alcommon/alproxy.h>
-#include <alproxies/dcmproxy.h>
-#include <alproxies/almemoryproxy.h>
-#undef BOOST_SIGNALS_NO_DEPRECATION_WARNING
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+//#ifdef __clang__
+//#pragma clang diagnostic push
+//
+//#pragma clang diagnostic ignored "-Wunknown-pragmas"
+//#pragma clang diagnostic ignored "-Wconversion"
+//#pragma clang diagnostic ignored "-Wunused-variable"
+//#pragma clang diagnostic ignored "-Wunused-local-typedef"
+//#endif
+//#define BOOST_SIGNALS_NO_DEPRECATION_WARNING
+//#include <alcommon/albroker.h>
+//#include <alcommon/alproxy.h>
+//#include <alproxies/dcmproxy.h>
+//#include <alproxies/almemoryproxy.h>
+//#undef BOOST_SIGNALS_NO_DEPRECATION_WARNING
+//#ifdef __clang__
+//#pragma clang diagnostic pop
+//#endif
 
 #include <iostream>
-#include <lua.hpp>
+//#include <lua.hpp>
 
-#include "RoboCupGameControlData.h"
+//#include "RoboCupGameControlData.h"
 #include "bhuman.h"
 using namespace std;
+
+class DcmII {
+	private:
+		void lua_initialize();
+	public:
+		DcmII();
+		int testfunction();
+		void get_actuator_positions(float* in_out_buffer, float& size);
+};
 
 // static void set_actuator_positions(std::vector<double> vs, std::vector<double> ids);
 
@@ -39,7 +49,7 @@ using namespace std;
 
 // static void set_actuator_position(double x, int ind);
 
-// static int get_actuator_positions(float* in_out_buffer, float& size);
+// static void get_actuator_positions(float* in_out_buffer, float& size);
 
 // static void set_actuator_hardness(double x, int ind);
 

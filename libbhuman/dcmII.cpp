@@ -67,6 +67,21 @@ LBHData * data;
 bool initialized = false;
 int writingActuators = -1;
 
+DcmII::DcmII() {}
+
+// int DcmII::testfunction() {
+// 	return 779997;
+// }
+
+// int testfunction() {
+// 	return 99779;
+// }
+
+void DcmII::lua_initialize() {
+  fd = shm_open(LBH_MEM_NAME, O_RDWR, S_IRUSR | S_IWUSR);
+  data = (LBHData*)mmap(NULL, sizeof(LBHData), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+  initialized = true;
+}
 
 // static void lua_initialize () {
 //   fd = shm_open(LBH_MEM_NAME, O_RDWR, S_IRUSR | S_IWUSR);
@@ -113,16 +128,39 @@ int writingActuators = -1;
 //   data->luaNewSet = true;
 // }
 
-// /**
-//  ** Returns actuator command for all positions
-//  **/
-// static int get_actuator_positions(float* in_out_buffer, float& size) {
+/**
+ ** Returns actuator command for all positions
+ **/
+
+void DcmII::get_actuator_positions(float* in_out_buffer, float& size) {
+  if (!initialized) {
+    lua_initialize();
+  }
+  data->readingActuators = data->newestActuators;
+  float * actuators = data->actuators[data->readingActuators];
+
+  float actuatorPositions[nJoint];
+  for (int i = 0; i < nJoint; i++) {
+    int bHumanIndex = luaToBHumanPos[i];
+    actuatorPositions[i] = actuators[bHumanIndex];
+  }
+  size = nJoint;
+
+  // for (int i=0; i<size; i++) {
+  //   cout<<actuatorPositions[i]<<endl;
+  // }
+
+  memcpy(in_out_buffer, actuatorPositions, sizeof(actuatorPositions));
+}
+
+
+// static void get_actuator_positions(float* in_out_buffer, float& size) {
 //   if (!initialized) {
 //     lua_initialize();
 //   }
 //   data->readingActuators = data->newestActuators;
 //   float * actuators = data->actuators[data->readingActuators];
-
+// 
 //   double actuatorPositions[nJoint];
 //   for (int i = 0; i < nJoint; i++) {
 //     int bHumanIndex = luaToBHumanPos[i];

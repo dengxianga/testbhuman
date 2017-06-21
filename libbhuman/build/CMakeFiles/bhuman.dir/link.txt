@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -O3 -DNDEBUG   -shared -Wl,-soname,libbhuman.so -o ../libbhuman.so CMakeFiles/bhuman.dir/bhuman.o  -L/home/nao/newnaoSDK/naoqi-sdk-2.1.4.13-linux32/lib 

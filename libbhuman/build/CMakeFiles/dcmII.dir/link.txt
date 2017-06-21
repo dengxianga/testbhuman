@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -O3 -DNDEBUG   -shared -Wl,-soname,libdcmII.so -o ../libdcmII.so CMakeFiles/dcmII.dir/dcmII.o  -L/home/nao/newnaoSDK/naoqi-sdk-2.1.4.13-linux32/lib ../libbhuman.so -Wl,-rpath,/home/nao/newnaoSDK/naoqi-sdk-2.1.4.13-linux32/lib:/home/nao/testbhuman/libbhuman 
