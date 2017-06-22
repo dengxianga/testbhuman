@@ -67,7 +67,11 @@ LBHData * data;
 bool initialized = false;
 int writingActuators = -1;
 
-DcmII::DcmII() {}
+DcmII::DcmII() {
+  std::ofstream myfile;
+  myfile.open ("example.txt");
+  // get_time(start_time);
+}
 
 int DcmII::testfunction() {
 	return 779997;
@@ -91,6 +95,48 @@ void DcmII::set_actuator_positions(float* vs, int* ids) {
     int bHumanIndex = luaToBHumanPos[ids[i]];
     data->luaBuffer[bHumanIndex] = vs[i];
   }
+
+
+  ////// printing /////////////////////////
+  float time = 0.00000000000f;
+
+  float expected_result[22] = {0};
+  float expected_size = 0.0f;
+
+  float actual_result[22] = {0};
+  float actual_size = 0.0f;
+
+  get_time(time);
+  get_actuator_positions(expected_result, expected_size);
+  get_sensor_positions(actual_result, actual_size);
+
+
+  // std::cout<< "set_actuator_positions: " << &write_file << std::endl;
+  std::ofstream myfile;
+  myfile.open ("example.txt",std::ios_base::app);
+  // myfile<<"initialized dcmII.cpp bbbbbbbbbb \n";
+  // myfile << std::fixed;
+  myfile << time << " "; 
+
+  for (int i = 0; i < size; i++) {
+    myfile << vs[i] << " ";
+  }
+
+  for (int i = 0; i < expected_size; i++) {
+    myfile << expected_result[i] << " ";
+  }
+
+  for (int i = 0; i < actual_size; i++) {
+    myfile << actual_result[i] << " ";
+  }
+  myfile<<"\n";
+  myfile.close();
+ 
+
+
+  // write_file << "\n";
+
+  ///////////////////////////////////////
 
   data->luaNewSet = true;
 }

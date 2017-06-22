@@ -29,6 +29,7 @@
 //#endif
 
 #include <iostream>
+#include <fstream>
 //#include <lua.hpp>
 
 //#include "RoboCupGameControlData.h"
@@ -37,8 +38,10 @@ using namespace std;
 
 class DcmII {
   private:
+    // float start_time;
     void lua_initialize();
   public:
+    // std::ofstream write_file;
     DcmII();
     int testfunction();
 		void set_actuator_position(float x, int index);
@@ -69,6 +72,7 @@ class DcmII {
     void get_sensor_fsrLeft(float* in_out_buffer, float& size);
     void get_sensor_fsrRight(float* in_out_buffer, float& size);
 		void get_sensor_list(float* in_out_buffer, float& size);
+
 };
 
 

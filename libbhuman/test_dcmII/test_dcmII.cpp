@@ -34,17 +34,21 @@ void rotate_set_actuator_positions_hardnesses_test(DcmII dcmIIobj) {
 	int position_ids[22] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21};
 	float position_values[22] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-	float speed = 0.005;
+	float speed = 0.04;
 	int count = 0;
 	// float result[100] = {0};
 	// float size = 0.0f;
 	// float hardness_result[100] = {0};
 	// float hardness_size = 0.0f;
+
+	std::cout<< "entered function" <<std::endl;
 	while (1) {
-		position_values[8] = cos(speed*count);
+		position_values[2] = cos(speed*count);
 		dcmIIobj.set_actuator_positions(position_values, position_ids);
 		count = count + 1;
 		usleep(0.01*1000000);
+
+		std::cout<< "loop" <<std::endl;
 
 // 		if (count % 1 == 0) {
 // 			dcmIIobj.get_actuator_positions(result, size);
