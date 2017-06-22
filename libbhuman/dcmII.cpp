@@ -15,16 +15,16 @@ LHipPitch,
 LKneePitch, 
 LAnklePitch, 
 LAnkleRoll,
+RShoulderPitch, 
+RShoulderRoll,
+RElbowYaw, 
+RElbowRoll, 
 RHipYawPitch,
 RHipRoll, 
 RHipPitch,
 RKneePitch, 
 RAnklePitch, 
 RAnkleRoll,
-RShoulderPitch, 
-RShoulderRoll,
-RElbowYaw, 
-RElbowRoll, 
 nJoint};
 
 const int indexHead = HeadYaw;
@@ -51,16 +51,16 @@ lHipPitchPositionActuator,
 lKneePitchPositionActuator,  
 lAnklePitchPositionActuator,  
 lAnkleRollPositionActuator, 
+rShoulderPitchPositionActuator,  
+rShoulderRollPositionActuator,  
+rElbowYawPositionActuator,  
+rElbowRollPositionActuator,
 lHipYawPitchPositionActuator, 
 rHipRollPositionActuator, 
 rHipPitchPositionActuator,  
 rKneePitchPositionActuator, 
 rAnklePitchPositionActuator,  
-rAnkleRollPositionActuator, 
-rShoulderPitchPositionActuator,  
-rShoulderRollPositionActuator,  
-rElbowYawPositionActuator,  
-rElbowRollPositionActuator};
+rAnkleRollPositionActuator}; 
 
 int fd;
 LBHData * data;
@@ -84,7 +84,8 @@ void DcmII::set_actuator_positions(float* vs, int* ids) {
     lua_initialize();
   }
 
-	int size = sizeof(vs)/sizeof(vs[0]);
+	int size = 22;
+	// int size = sizeof(vs)/sizeof(vs[0]);
 
   for (unsigned int i = 0; i < size; i++) {
     int bHumanIndex = luaToBHumanPos[ids[i]];
@@ -94,12 +95,12 @@ void DcmII::set_actuator_positions(float* vs, int* ids) {
   data->luaNewSet = true;
 }
 
-void DcmII::set_actuator_hardnesses(float* vs, int* ids) {
+void DcmII::set_actuator_hardnesses(float* vs, int* ids, int size) {
   if (!initialized) {
     lua_initialize();
   }
 
-	int size = sizeof(vs)/sizeof(vs[0]);
+	// int size = sizeof(vs)/sizeof(vs[0]);
 
   for (unsigned int i = 0; i < size; i++) {
     int bHumanIndex = luaToBHumanPos[ids[i]];

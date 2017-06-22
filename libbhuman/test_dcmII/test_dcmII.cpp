@@ -8,43 +8,53 @@ void simple_test(DcmII dcmIIobj) {
 }
 
 void set_actuator_positions_hardnesses_test(DcmII dcmIIobj) {
-	int ids[2] = {0, 1};
+	// int ids[2] = {6, 7};
+	int ids[22] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21};
+	float hardness_values[22] = {0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75};
 
-	float hardness_values[2] = {0.7, 0.7};
-	dcmIIobj.set_actuator_hardnesses(hardness_values, ids);
 
-	float values[2] = {0.5, -0.5};
-	dcmIIobj.set_actuator_positions(values, ids);
+	// float hardness_values[2] = {0.7, 0.7};
+	dcmIIobj.set_actuator_hardnesses(hardness_values, ids, 22);
+
+	// float values[2] = {0.5, -0.5};
+	// dcmIIobj.set_actuator_positions(values, ids);
 }
 
 void rotate_set_actuator_positions_hardnesses_test(DcmII dcmIIobj) {
 	// rotate head and print positions/hardnesses
-	int ids[2] = {0, 1};
+	// int ids[2] = {0, 1};
 
-	float hardness_values[2] = {0.7, 0.7};
-	dcmIIobj.set_actuator_hardnesses(hardness_values, ids);
+	// float hardness_values[2] = {0.7, 0.7};
+	// dcmIIobj.set_actuator_hardnesses(hardness_values, ids, 22);
+	int hardness_ids[22] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21};
+	float hardness_values[22] = {0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75};
 
-	float values[2] = {0.5, 0};
-	float speed = 0.0005;
+	dcmIIobj.set_actuator_hardnesses(hardness_values, hardness_ids, 22);
+
+	int position_ids[22] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21};
+	float position_values[22] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+	float speed = 0.005;
 	int count = 0;
-	float result[100] = {0};
-	float size = 0.0f;
-	float hardness_result[100] = {0};
-	float hardness_size = 0.0f;
+	// float result[100] = {0};
+	// float size = 0.0f;
+	// float hardness_result[100] = {0};
+	// float hardness_size = 0.0f;
 	while (1) {
-		values[0] = cos(speed*count);
-		dcmIIobj.set_actuator_positions(values, ids);
+		position_values[8] = cos(speed*count);
+		dcmIIobj.set_actuator_positions(position_values, position_ids);
 		count = count + 1;
+		usleep(0.01*1000000);
 
-		if (count % 1 == 0) {
-			dcmIIobj.get_actuator_positions(result, size);
-			dcmIIobj.get_actuator_hardnesses(hardness_result, hardness_size);
-			
-			for (int i = 0; i < size; i++) {
-				std::cout << i << "   position: " << result[i];
-				std::cout << "      hardness: " << hardness_result[i] << std::endl;
-			}
-		}
+// 		if (count % 1 == 0) {
+// 			dcmIIobj.get_actuator_positions(result, size);
+// 			dcmIIobj.get_actuator_hardnesses(hardness_result, hardness_size);
+// 			
+// 			for (int i = 0; i < size; i++) {
+// 				std::cout << i << "   position: " << result[i];
+// 				std::cout << "      hardness: " << hardness_result[i] << std::endl;
+// 			}
+// 		}
 	}
 }
 
@@ -373,9 +383,8 @@ void get_sensor_fsrRight_test(DcmII dcmIIobj) {
 int main() {
 	DcmII dcmIIobj;
 
-	get_sensor_list_test(dcmIIobj);
-	
-	// rotate_set_actuator_positions_hardnesses_test(dcmIIobj);
+	rotate_set_actuator_positions_hardnesses_test(dcmIIobj);
+	// set_actuator_positions_hardnesses_test(dcmIIobj);
 
 	std::cout <<"Hello World!" <<std::endl;
 

@@ -44,7 +44,7 @@ class DcmII {
 		void set_actuator_position(float x, int index);
     void set_actuator_positions(float* vs, int* ids);
 		void set_actuator_hardness(float x, int index);
-    void set_actuator_hardnesses(float* vs, int* ids);
+    void set_actuator_hardnesses(float* vs, int* ids, int size);
 		// void set_actuator_command(float* joint_values, int startIndex);
     void set_actuator_ultraSonic(int command);
 
