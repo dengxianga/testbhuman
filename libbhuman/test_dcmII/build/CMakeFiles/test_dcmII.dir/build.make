@@ -56,15 +56,15 @@ CMakeFiles/test_dcmII.dir/test_dcmII.o: CMakeFiles/test_dcmII.dir/flags.make
 CMakeFiles/test_dcmII.dir/test_dcmII.o: ../test_dcmII.cpp
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/nao/testbhuman/libbhuman/test_dcmII/build/CMakeFiles $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/test_dcmII.dir/test_dcmII.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/test_dcmII.dir/test_dcmII.o -c /home/nao/testbhuman/libbhuman/test_dcmII/test_dcmII.cpp
+	/usr/bin/g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/test_dcmII.dir/test_dcmII.o -c /home/nao/testbhuman/libbhuman/test_dcmII/test_dcmII.cpp
 
 CMakeFiles/test_dcmII.dir/test_dcmII.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/test_dcmII.dir/test_dcmII.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/nao/testbhuman/libbhuman/test_dcmII/test_dcmII.cpp > CMakeFiles/test_dcmII.dir/test_dcmII.i
+	/usr/bin/g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/nao/testbhuman/libbhuman/test_dcmII/test_dcmII.cpp > CMakeFiles/test_dcmII.dir/test_dcmII.i
 
 CMakeFiles/test_dcmII.dir/test_dcmII.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/test_dcmII.dir/test_dcmII.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/nao/testbhuman/libbhuman/test_dcmII/test_dcmII.cpp -o CMakeFiles/test_dcmII.dir/test_dcmII.s
+	/usr/bin/g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/nao/testbhuman/libbhuman/test_dcmII/test_dcmII.cpp -o CMakeFiles/test_dcmII.dir/test_dcmII.s
 
 CMakeFiles/test_dcmII.dir/test_dcmII.o.requires:
 .PHONY : CMakeFiles/test_dcmII.dir/test_dcmII.o.requires

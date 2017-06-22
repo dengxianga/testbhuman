@@ -7,24 +7,22 @@ void simple_test(DcmII dcmIIobj) {
 	std::cout << test << std::endl;
 }
 
-// ========== Retest! ==================
 void set_actuator_positions_hardnesses_test(DcmII dcmIIobj) {
 	int ids[2] = {0, 1};
 
 	float hardness_values[2] = {0.7, 0.7};
-	dcmIIobj.set_actuator_hardnesses(hardness_values, ids, 2);
+	dcmIIobj.set_actuator_hardnesses(hardness_values, ids);
 
 	float values[2] = {0.5, -0.5};
-	dcmIIobj.set_actuator_positions(values, ids, 2);
+	dcmIIobj.set_actuator_positions(values, ids);
 }
 
-// ========== Retest! ==================
 void rotate_set_actuator_positions_hardnesses_test(DcmII dcmIIobj) {
 	// rotate head and print positions/hardnesses
 	int ids[2] = {0, 1};
 
 	float hardness_values[2] = {0.7, 0.7};
-	dcmIIobj.set_actuator_hardnesses(hardness_values, ids, 2);
+	dcmIIobj.set_actuator_hardnesses(hardness_values, ids);
 
 	float values[2] = {0.5, 0};
 	float speed = 0.0005;
@@ -35,7 +33,7 @@ void rotate_set_actuator_positions_hardnesses_test(DcmII dcmIIobj) {
 	float hardness_size = 0.0f;
 	while (1) {
 		values[0] = cos(speed*count);
-		dcmIIobj.set_actuator_positions(values, ids, 2);
+		dcmIIobj.set_actuator_positions(values, ids);
 		count = count + 1;
 
 		if (count % 1 == 0) {
@@ -49,6 +47,63 @@ void rotate_set_actuator_positions_hardnesses_test(DcmII dcmIIobj) {
 		}
 	}
 }
+
+void set_actuator_position_hardness_test(DcmII dcmIIobj) {
+	dcmIIobj.set_actuator_position(0.55, 17); // knee pitch
+	dcmIIobj.set_actuator_hardness(0.58, 17);
+}
+
+void get_actuator_position_hardness_test(DcmII dcmIIobj) {
+	float pos = 0.0f;
+	dcmIIobj.get_actuator_position(pos, 17);
+	cout << "position value: " << pos << endl;
+
+	float hardness = 0.0f;
+	dcmIIobj.get_actuator_hardness(hardness, 17);
+	cout << "hardness value: " << hardness << endl;
+}
+
+// void set_actuator_command_test(DcmII dcmIIobj) {
+// 	float joint_values[6] = {0.5, 0.5, 0.5, 0.5, 0.5, 0.5};
+// 	dcmIIobj.set_actuator_command(joint_values, 6);
+// 
+// 	float hardness_values[6] = {0.5, 0.5, 0.5, 0.5, 0.5, 0.5};
+// 	int ids[6] = {6, 7, 8, 9, 10, 11};
+// 	dcmIIobj.set_actuator_hardnesses(hardness_values, ids);
+// }
+// 
+// void get_actuator_command_test(DcmII dcmIIobj) {
+// 	float result[100] = {};
+// 	float size = 0.0f;
+// 	int startIndex = 6;
+// 
+// 	dcmIIobj.get_actuator_command(result, size, startIndex);
+// 	for (int i=0; i<size; i++) {
+// 		cout << "i: " << result[i] << endl;
+// 	}
+// }
+
+void get_sensor_list_test(DcmII dcmIIobj) {
+	float result[100] = {};
+	float size = 0.0f;
+	dcmIIobj.get_sensor_list(result, size);
+
+	for (int i=0; i<size; i++) {
+		cout << i << ": " << result[i] << endl;
+	}
+
+	cout << "size: " << size << endl;
+}
+
+
+
+
+
+////////////////////// DP /////////////////////
+
+
+
+
 
 void get_actuator_positions_hardnesses_test(DcmII dcmIIobj) {
 	int count = 0;
@@ -213,7 +268,6 @@ void get_sensor_bumperRight_test(DcmII dcmIIobj) {
   std::cout << "bumperRight size: " << size << std::endl;
 }
 
-// ========== Retest! ==================
 void get_sensor_sonarLeft_test(DcmII dcmIIobj) {
   float result[100] = {0};
   float size = 0.0f;
@@ -234,7 +288,6 @@ void get_sensor_sonarLeft_test(DcmII dcmIIobj) {
   std::cout << "sonarLeft size: " << size << std::endl;
 }
 
-// ========== Retest! ==================
 void get_sensor_sonarRight_test(DcmII dcmIIobj) {
   float result[100] = {0};
   float size = 0.0f;
@@ -242,7 +295,7 @@ void get_sensor_sonarRight_test(DcmII dcmIIobj) {
 
   dcmIIobj.set_actuator_ultraSonic(68);
   while (count < 10000000) {
-    if (count % 100 == 0) {
+    if (count % 1000 == 0) {
       dcmIIobj.get_sensor_sonarRight(result, size);
       for (int i = 0; i < size; i++) {
         std::cout << i << "   sonarRight: " << result[i] << std::endl;
@@ -267,7 +320,6 @@ void get_sensor_temperature_test(DcmII dcmIIobj) {
   std::cout << "temperature size: " << size << std::endl;
 }
 
-// ========== Retest! ==================
 void get_sensor_current_test(DcmII dcmIIobj) {
   float result[100] = {0};
   float size = 0.0f;
@@ -320,8 +372,10 @@ void get_sensor_fsrRight_test(DcmII dcmIIobj) {
 
 int main() {
 	DcmII dcmIIobj;
+
+	get_sensor_list_test(dcmIIobj);
 	
-	get_sensor_bumperLeft_test(dcmIIobj);
+	// rotate_set_actuator_positions_hardnesses_test(dcmIIobj);
 
 	std::cout <<"Hello World!" <<std::endl;
 

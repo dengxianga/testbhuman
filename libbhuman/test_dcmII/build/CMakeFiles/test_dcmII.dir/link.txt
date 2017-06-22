@@ -1,1 +1,1 @@
-/usr/bin/c++   -O3 -DNDEBUG    CMakeFiles/test_dcmII.dir/test_dcmII.o  -o test_dcmII  -L/home/nao/testbhuman/libbhuman -rdynamic -ldcmII -Wl,-rpath,/home/nao/testbhuman/libbhuman 
+/usr/bin/g++   -O3 -DNDEBUG    CMakeFiles/test_dcmII.dir/test_dcmII.o  -o test_dcmII  -L/home/nao/testbhuman/libbhuman -rdynamic -ldcmII -Wl,-rpath,/home/nao/testbhuman/libbhuman 

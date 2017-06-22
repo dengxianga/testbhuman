@@ -36,32 +36,39 @@
 using namespace std;
 
 class DcmII {
-	private:
-		void lua_initialize();
-	public:
-		DcmII();
-		int testfunction();
-		void get_actuator_positions(float* in_out_buffer, float& size);
-	    void set_actuator_positions(float* vs, int* ids, int size);
-	    void set_actuator_hardnesses(float* vs, int* ids, int size);
-	    void get_actuator_hardnesses(float* in_out_buffer, float& size);
-	    void get_sensor_positions(float* in_out_buffer, float& size);
-	    void get_imu_angle(float* in_out_buffer, float& size);
-	    void get_imu_acc(float* in_out_buffer, float& size);
-	    void get_imu_gyr(float* in_out_buffer, float& size);
-	    void get_time(float& time);
-		void get_sensor_batteryCharge(float& value);
-		void get_sensor_button(float& value);
-		void get_sensor_bumperLeft(float* in_out_buffer, float& size);
-		void get_sensor_bumperRight(float* in_out_buffer, float& size);
-		void set_actuator_ultraSonic(int command);
-		void get_sensor_sonarLeft(float* in_out_buffer, float& size);
-		void get_sensor_sonarRight(float* in_out_buffer, float& size);
-		void get_sensor_temperature(float* in_out_buffer, float& size);
-		void get_sensor_current(float* in_out_buffer, float& size);
-		void get_sensor_fsrLeft(float* in_out_buffer, float& size);
-		void get_sensor_fsrRight(float* in_out_buffer, float& size);
+  private:
+    void lua_initialize();
+  public:
+    DcmII();
+    int testfunction();
+		void set_actuator_position(float x, int index);
+    void set_actuator_positions(float* vs, int* ids);
+		void set_actuator_hardness(float x, int index);
+    void set_actuator_hardnesses(float* vs, int* ids);
+		// void set_actuator_command(float* joint_values, int startIndex);
+    void set_actuator_ultraSonic(int command);
 
+    void get_actuator_position(float& value, int index);
+		void get_actuator_positions(float* in_out_buffer, float& size);
+		void get_actuator_hardness(float& value, int index);
+    void get_actuator_hardnesses(float* in_out_buffer, float& size);
+		// void get_actuator_command(float* in_out_buffer, float& size, int startIndex);
+    void get_sensor_positions(float* in_out_buffer, float& size);
+    void get_imu_angle(float* in_out_buffer, float& size);
+    void get_imu_acc(float* in_out_buffer, float& size);
+    void get_imu_gyr(float* in_out_buffer, float& size);
+    void get_time(float& time);
+    void get_sensor_batteryCharge(float& value);
+    void get_sensor_button(float& value);
+    void get_sensor_bumperLeft(float* in_out_buffer, float& size);
+    void get_sensor_bumperRight(float* in_out_buffer, float& size);
+    void get_sensor_sonarLeft(float* in_out_buffer, float& size);
+    void get_sensor_sonarRight(float* in_out_buffer, float& size);
+    void get_sensor_temperature(float* in_out_buffer, float& size);
+    void get_sensor_current(float* in_out_buffer, float& size);
+    void get_sensor_fsrLeft(float* in_out_buffer, float& size);
+    void get_sensor_fsrRight(float* in_out_buffer, float& size);
+		void get_sensor_list(float* in_out_buffer, float& size);
 };
 
 

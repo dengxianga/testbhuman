@@ -41,6 +41,8 @@ sys/time.h
 -
 sys/stat.h
 -
+vector
+-
 iostream
 -
 bhuman.h
@@ -62,5 +64,7 @@ stdint.h
 dcmII.h
 /home/nao/testbhuman/libbhuman/test_dcmII/dcmII.h
 iostream
+-
+cmath
 -
 
