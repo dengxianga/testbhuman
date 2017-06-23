@@ -292,15 +292,6 @@ function get_sensor_fsrRight()
 	return result;
 end
 
--- ---
--- -- @return - US reading if using functionality setting 0-3
--- -- (doesn't currently work)
--- ---
--- function get_sensor_ultraSonic()
--- 	local result = bhlowcmd.get_sensor_ultraSonic();
--- 	return result;
--- end
-
 function set_actuator_ledFootLeft(values)
 	bhlowcmd.set_actuator_ledFootLeft(values);
 end
