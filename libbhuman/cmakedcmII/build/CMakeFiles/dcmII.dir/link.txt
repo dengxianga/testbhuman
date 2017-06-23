@@ -1,1 +1,0 @@
-/usr/bin/g++  -fPIC -O3 -DNDEBUG   -shared -Wl,-soname,libdcmII.so -o /home/nao/testbhuman/libbhuman/libdcmII.so CMakeFiles/dcmII.dir/home/nao/testbhuman/libbhuman/dcmII.o  -L/home/nao/testbhuman/libbhuman -lrt -Wl,-rpath,/home/nao/testbhuman/libbhuman 
