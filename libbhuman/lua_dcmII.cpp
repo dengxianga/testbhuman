@@ -127,6 +127,7 @@ int fd;
 LBHData * data;
 bool initialized = false;
 int writingActuators = -1;
+std::vector<double> v(lbhNumOfPositionActuatorIds);
 
 static int luaBH_getdummy (lua_State *L) {
   lua_pushnumber(L, 0);
@@ -188,39 +189,32 @@ static void lua_pushvector(lua_State *L, std::vector<double> &v) {
   }
 }
 
+// static std::vector<double> lua_checkvector(lua_State *L, int narg) {
+//   if (!lua_istable(L, narg))
+//     luaL_typerror(L, narg, "vector");
+//   int n = lua_objlen(L, narg);
+//   std::vector<double> v(n);
+//   for (int i = 0; i < n; i++) {
+//     lua_rawgeti(L, narg, i+1);
+//     v[i] = lua_tonumber(L, -1);
+//     lua_pop(L, 1);
+//   }
+//   return v;
+// }
+
 static std::vector<double> lua_checkvector(lua_State *L, int narg) {
   if (!lua_istable(L, narg))
     luaL_typerror(L, narg, "vector");
   int n = lua_objlen(L, narg);
-  std::vector<double> v(n);
   for (int i = 0; i < n; i++) {
     lua_rawgeti(L, narg, i+1);
     v[i] = lua_tonumber(L, -1);
     lua_pop(L, 1);
   }
+
   return v;
 }
 
-// static void openActuators(float*& actuators)
-// {
-//   assert(writingActuators == -1);
-//   writingActuators = 0;
-//   if(writingActuators == data->newestActuators)
-//     ++writingActuators;
-//   if(writingActuators == data->readingActuators)
-//     if(++writingActuators == data->newestActuators)
-//       ++writingActuators;
-//   assert(writingActuators != data->newestActuators);
-//   assert(writingActuators != data->readingActuators);
-//   actuators = data->actuators[writingActuators];
-// }
-
-// static void closeActuators()
-// {
-//   assert(writingActuators >= 0);
-//   data->newestActuators = writingActuators;
-//   writingActuators = -1;
-// }
 
 static int set_actuator_positions(lua_State *L) {
   if (!initialized) {
@@ -229,31 +223,13 @@ static int set_actuator_positions(lua_State *L) {
   std::vector<double> vs = lua_checkvector(L, 1);
   std::vector<double> ids = lua_checkvector(L, 2);
 
-  //////////// control with lua wrapper, no buffer
-  // float * actuators;
-  // openActuators(actuators);
+  int size = lua_objlen(L, 1);
 
-  // for (unsigned int i = 0; i < vs.size(); i++) {
-  //   actuators[(int)ids[i]-1] = vs[i];
-  //   // std::cout<<" "<< vs[i];
-  // }
-  // // std::cout<<std::endl;
-  // closeActuators();
-  //////////
-
-	//data->readingSensors = data->newestSensors;
-  //float * sensors = data->sensors[data->newestSensors];
-
-  //////// control with luawrapper, buffer
-  for (unsigned int i = 0; i < vs.size(); i++) {
-    int bHumanIndex = luaToBHumanPos[(int) ids[i] - 1];
-    data->luaBuffer[bHumanIndex] = vs[i];
+  for (unsigned int i = 0; i < size; i++) {
+    data->luaBuffer[(int)ids[i]-1] = vs[i];
   }
 
   data->luaNewSet = true;
-  ///////// 
-
-  // std::cout<<data->luaNewSet<<std::endl;
 
   return 0;
 }
@@ -272,8 +248,9 @@ static int set_actuator_hardnesses(lua_State *L) {
 	//float * actuators = data->actuators[data->readingActuators];
 
 	//float epsilon = 0.1;
+  int size = lua_objlen(L, 1);
 
-  for (unsigned int i = 0; i < vs.size(); i++) {
+  for (unsigned int i = 0; i < size; i++) {
     int bHumanIndex = luaToBHumanPos[(int) ids[i] - 1];
 	//	if (abs(sensors[bHumanIndex*3] - actuators[bHumanIndex])>epsilon) {
 	//		std::cout << "in hardnesses" << std::endl;
@@ -332,8 +309,10 @@ static int set_actuator_positions_adjust(lua_State *L) {
   float * actuators = data->actuators[data->readingActuators];
 
 	float scale = 0.1;
+  
+  int size = lua_objlen(L, 1);
 
-  for (unsigned int i = 0; i < ids.size(); i++) {
+  for (unsigned int i = 0; i < size; i++) {
     int bHumanIndex = luaToBHumanPos[(int) ids[i] - 1];
 		double error = actuators[bHumanIndex] - sensors[bHumanIndex*3];
 		data->luaBuffer[bHumanIndex] = actuators[bHumanIndex] + scale*error;
@@ -472,7 +451,9 @@ static int set_actuator_command(lua_State *L) {
   std::vector<double> joint_values = lua_checkvector(L, 1);
   int startIndex = luaL_checkint(L, 2) - 1;
   
-  for (int i = startIndex; i < startIndex + joint_values.size(); i++) {
+  int size = lua_objlen(L, 1);
+
+  for (int i = startIndex; i < startIndex + size; i++) {
     // std::cout << "i: " << i << "   joint_values[i]: " << joint_values[i-startIndex] << std::endl;
     int bHumanIndex = luaToBHumanPos[i];
     data->luaBuffer[bHumanIndex] = joint_values[i-startIndex];
@@ -577,7 +558,7 @@ static int get_imu_angle(lua_State *L) {
   }
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
-  double ImuReadings[3] = {(double) sensors[angleXSensor], (double) sensors[angleYSensor], sensors[angleZSensor]};
+  double ImuReadings[3] = {(double) sensors[angleXSensor], (double) sensors[angleYSensor], (double) sensors[angleZSensor]};
   lua_pushdouble_array(L, ImuReadings, 3);
   return 1;
 }
@@ -639,8 +620,10 @@ static int set_actuator_position_forever(lua_State *L) {
       // vs.push_back(cos(0.01*cnt));
       // std::vector<int> ids;
       // ids.push_back(1);
-      //////// control with luawrapper, buffer
-      for (unsigned int i = 0; i < vs.size(); i++) {
+      //////// control with luawrapper, buffer  
+      int size = lua_objlen(L, 1);
+
+      for (unsigned int i = 0; i < size; i++) {
         data->luaBuffer[(int)ids[i]-1] = vs[i];
       }
 

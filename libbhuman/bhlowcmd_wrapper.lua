@@ -8,20 +8,20 @@ function set_actuator_hardnesses(values, indices)
 	bhlowcmd.set_actuator_hardnesses(values, indices); 
 end
 
----
--- @param values - vector of actuator position values
--- @param indicies - vector detailing which indices to set 
--- 					 correspondng to values vector
----
-function set_actuator_positions(values, indices)
-	bhlowcmd.set_actuator_positions(values, indicies); 
+function set_actuator_position(values, index)
+	if type(values) == "number" then
+		bhlowcmd.set_actuator_position(values, index);
+	else
+		index = index or 1;
+		local indices = vector.zeros(#values);
+		for i = 1, #values do
+			indices[i] = index + i - 1;
+		end
+		bhlowcmd.set_actuator_positions(values, indices);
+	end
 end
 
----
--- @param value - single position 
--- @param indicies - single index indicating which actuator to set
----
-function set_actuator_position(value, index)
+function set_actuator_positions(value, index)
 	bhlowcmd.set_actuator_position(value, index); 
 end
 
@@ -276,7 +276,7 @@ end
 
 ---
 -- @return - left foot sensor readings in order: left front, 
---			 right front, left rear, right rear
+--			 left rear, right front, right rear
 ---
 function get_sensor_fsrLeft() 
 	local result = bhlowcmd.get_sensor_fsrLeft();
@@ -285,7 +285,7 @@ end
 
 ---
 -- @return - right foot sensor readings in order: left front, 
---			 right front, left rear, right rear
+--			 left rear, right front, right rear
 ---
 function get_sensor_fsrRight()
 	local result = bhlowcmd.get_sensor_fsrRight();

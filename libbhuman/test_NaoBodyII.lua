@@ -32,18 +32,20 @@ function set_actuator_hardnesses_test_1()
 	set_actuator_hardness({0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0, 0, 0, 0});
 end
 
-function rotate_joint()
+local function rotate_joint()
 	local hardnesses = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0, 0, 0, 0};
-	hardnesses[1] = 0.3;
+	hardnesses[1] = 0.5;
+	hardnesses[3] = 0.5;
+	hardnesses[19] = 0.5;
 	local positions = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0, 0, 0, 0};
-	set_actuator_hardness(hardnesses);
-	local speed = 0.005*0.3;
+	Body.set_actuator_hardness(hardnesses);
+	local speed = 0.005*0.1;
 	local count = 0;
 	while (1) do
 		if (count % 20 == 0)  then 
 			new_pos = math.cos(speed * count);
-			set_actuator_position(new_pos, 1);
-			sleep(0.005);
+			Body.set_actuator_position(new_pos, 1);
+			sleep(0.005*0.33);
 		end
 		count = count + 1;
 	end
