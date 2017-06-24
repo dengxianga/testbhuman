@@ -1,6 +1,6 @@
 module(..., package.seeall);
 -- require('dcm');
-require('bhlowcmd_wrapper');
+require('lua_dcmII_wrapper');
 require('vector');
 require('unix');
 require('util');

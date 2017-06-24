@@ -11,12 +11,12 @@ INCLUDES=$(NaoQi_INC)
 
 CXXFLAGS +=-DDEBUG
 
-all: bhlowcmd
+all: lua_dcmII
 
 %.o: %.cpp %.h
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
 
-bhlowcmd: lua_dcmII.o
+lua_dcmII: lua_dcmII.o
 	$(LD) $(LDFLAGS) -o $@.$(SHLIBEXT) $(LIBOPTS) $^ $(LIB_DIR) -lm -llua $(NaoQi_LIB)
 
 clean:

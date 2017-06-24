@@ -1,4 +1,4 @@
--- For testing bhlowcmd and NaobodyII.lua
+-- For testing lua_dcmII and NaobodyII.lua
 
 Body = require('Lib/NaoBodyII');
 

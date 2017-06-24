@@ -1,11 +1,11 @@
 cwd = cwd or os.getenv('PWD')
 package.cpath = cwd.."/Lib/?.so;";
 
-bhlowcmd = require 'bhlowcmd'
+lua_dcmII = require 'lua_dcmII'
 require('init')
 
 function set_actuator_hardnesses(values, indices)
-	bhlowcmd.set_actuator_hardnesses(values, indices); 
+	lua_dcmII.set_actuator_hardnesses(values, indices); 
 end
 
 ---
@@ -14,7 +14,7 @@ end
 -- 					 correspondng to values vector
 ---
 function set_actuator_positions(values, indices)
-	bhlowcmd.set_actuator_positions(values, indicies); 
+	lua_dcmII.set_actuator_positions(values, indicies); 
 end
 
 ---
@@ -22,7 +22,7 @@ end
 -- @param indicies - single index indicating which actuator to set
 ---
 function set_actuator_position(value, index)
-	bhlowcmd.set_actuator_position(value, index); 
+	lua_dcmII.set_actuator_position(value, index); 
 end
 
 ---
@@ -42,14 +42,14 @@ end
 ---
 function set_actuator_hardness(values, index)
 	if type(values) == "number" then
-		bhlowcmd.set_actuator_hardness(values, index);
+		lua_dcmII.set_actuator_hardness(values, index);
 	else
 		index = index or 1;
 		local indices = vector.zeros(#values);
 		for i = 1, #values do
 			indices[i] = index + i - 1;
 		end
-		bhlowcmd.set_actuator_hardnesses(values, indices);
+		lua_dcmII.set_actuator_hardnesses(values, indices);
 	end
 end
  
@@ -59,9 +59,9 @@ end
 function get_actuator_position(index)
 	local result;
 	if index then
-		result = bhlowcmd.get_actuator_position(index);
+		result = lua_dcmII.get_actuator_position(index);
 	else
-		result = bhlowcmd.get_actuator_positions();
+		result = lua_dcmII.get_actuator_positions();
 	end
 	return result;
 end
@@ -70,7 +70,7 @@ end
 -- @return - expected actuator hardness of all joints
 ---
 function get_actuator_hardness()
-	local result = bhlowcmd.get_actuator_hardness(); 
+	local result = lua_dcmII.get_actuator_hardness(); 
 	return result;
 end
 
@@ -90,12 +90,12 @@ end
 ---
 function set_actuator_command(values, starting_index)
 	if type(values) == "number" then
-		bhlowcmd.set_actuator_position(values, starting_index);
-		--bhlowcmd.set_actuator_positions_adjust({starting_index});
+		lua_dcmII.set_actuator_position(values, starting_index);
+		--lua_dcmII.set_actuator_positions_adjust({starting_index});
 	else
 		starting_index = starting_index or 1;
-		bhlowcmd.set_actuator_command(values, starting_index);
-		--bhlowcmd.set_actuator_command_adjust(starting_index);
+		lua_dcmII.set_actuator_command(values, starting_index);
+		--lua_dcmII.set_actuator_command_adjust(starting_index);
 	end
 end
 
@@ -104,7 +104,7 @@ end
 -- @return - all expected position values of the limb (variable joints)
 ---
 function get_actuator_command(starting_index)
-	bhlowcmd.get_actuator_command(starting_index); 
+	lua_dcmII.get_actuator_command(starting_index); 
 end
 
 ---
@@ -119,9 +119,9 @@ end
 function get_sensor_position(index)
 	local result;
 	if index then
-		result = bhlowcmd.get_sensor_position(index);
+		result = lua_dcmII.get_sensor_position(index);
 	else
-		result = bhlowcmd.get_sensor_positions(); 
+		result = lua_dcmII.get_sensor_positions(); 
 	end
 	return result;
 end
@@ -130,7 +130,7 @@ end
 -- @return - all actual actuator positions (22 joints)
 ---
 function get_sensor_positions()
-	local result = bhlowcmd.get_sensor_positions(); 
+	local result = lua_dcmII.get_sensor_positions(); 
 	return result;
 end
 
@@ -138,7 +138,7 @@ end
 -- @return - all expected actuator hardnesses (22 joints)
 ---
 function get_actuator_hardnesses()
-	local result = bhlowcmd.get_actuator_hardnesses(); 
+	local result = lua_dcmII.get_actuator_hardnesses(); 
 	return result;
 end
 
@@ -146,7 +146,7 @@ end
 -- @return - X, Y, Z angle IMU measurements
 ---
 function get_sensor_imuAngle(index)
-	local result = bhlowcmd.get_imu_angle(); 
+	local result = lua_dcmII.get_imu_angle(); 
 	if (index) then
 		return result[index];
 	end
@@ -157,7 +157,7 @@ end
 -- @return - X, Y, Z accelerometer IMU measurements
 ---
 function get_sensor_imuAcc(index)
-	local result = bhlowcmd.get_imu_acc(); 
+	local result = lua_dcmII.get_imu_acc(); 
 	if (index) then
 		return result[index];
 	end
@@ -168,7 +168,7 @@ end
 -- @return - X, Y, Z gyroscope IMU measurements
 ---
 function get_sensor_imuGyr(index)
-	local result = bhlowcmd.get_imu_gyr(); 
+	local result = lua_dcmII.get_imu_gyr(); 
 	if (index) then
 		return result[index];
 	end
@@ -179,14 +179,14 @@ end
 -- DATA STRUCTURE DOES NOT SUPPORT VELOCITY
 ---
 function set_actuator_velocity(value, index) 
-	bhlowcmd.set_actuator_velocity(value, index);
+	lua_dcmII.set_actuator_velocity(value, index);
 end
 
 ---
 -- DATA STRUCTURE DOES NOT SUPPORT VELOCITY
 ---
 function get_actuator_velocity(index)
-	local result = bhlowcmd.get_actuator_velocity(index);
+	local result = lua_dcmII.get_actuator_velocity(index);
 	return result;
 end
 
@@ -194,7 +194,7 @@ end
 -- @return - sensor reading of battery charge
 ---
 function get_sensor_batteryCharge()
-	local result = bhlowcmd.get_sensor_batteryCharge();
+	local result = lua_dcmII.get_sensor_batteryCharge();
 	return result;
 end
 
@@ -202,7 +202,7 @@ end
 -- @return - sensor reading of whether chest button is pressed
 ---
 function get_sensor_button()
-	local result = bhlowcmd.get_sensor_button();
+	local result = lua_dcmII.get_sensor_button();
 	return result;
 end
 
@@ -211,7 +211,7 @@ end
 --			 of left foot bumper are pressed
 ---
 function get_sensor_bumperLeft()
-	local result = bhlowcmd.get_sensor_bumperLeft();
+	local result = lua_dcmII.get_sensor_bumperLeft();
 	return result;
 end
 
@@ -220,7 +220,7 @@ end
 --			 of right foot bumper are pressed
 ---
 function get_sensor_bumperRight()
-	local result = bhlowcmd.get_sensor_bumperRight();
+	local result = lua_dcmII.get_sensor_bumperRight();
 	return result;
 end
 
@@ -229,7 +229,7 @@ end
 -- 			 to the left US sensor
 ---
 function get_sensor_usLeft()
-	local result = bhlowcmd.get_sensor_sonarLeft();
+	local result = lua_dcmII.get_sensor_sonarLeft();
 	return result;
 end
 
@@ -238,7 +238,7 @@ end
 -- 			 to the right US sensor
 ---
 function get_sensor_usRight()
-	local result = bhlowcmd.get_sensor_sonarRight();
+	local result = lua_dcmII.get_sensor_sonarRight();
 	return result;
 end
 
@@ -246,7 +246,7 @@ end
 -- @return - dcm time
 ---
 function get_sensor_time(index)
-	local result = bhlowcmd.get_time();
+	local result = lua_dcmII.get_time();
 	return result;
 end
 
@@ -254,7 +254,7 @@ end
 -- @return - current readings of all 22 joints
 ---
 function get_sensor_current()
-	local result = bhlowcmd.get_sensor_current();
+	local result = lua_dcmII.get_sensor_current();
 	return result;
 end
 
@@ -263,7 +263,7 @@ end
 -- @return - temperature readings of all 22 joints
 ---
 function get_sensor_temperature()
-	local result = bhlowcmd.get_sensor_temperature();
+	local result = lua_dcmII.get_sensor_temperature();
 	return result;
 end
 
@@ -271,7 +271,7 @@ end
 -- @param - US functionality setting, generally use 68
 ---
 function set_actuator_us(command)
-	bhlowcmd.set_actuator_ultraSonic(command);
+	lua_dcmII.set_actuator_ultraSonic(command);
 end
 
 ---
@@ -279,7 +279,7 @@ end
 --			 right front, left rear, right rear
 ---
 function get_sensor_fsrLeft() 
-	local result = bhlowcmd.get_sensor_fsrLeft();
+	local result = lua_dcmII.get_sensor_fsrLeft();
 	return result;
 end
 
@@ -288,46 +288,46 @@ end
 --			 right front, left rear, right rear
 ---
 function get_sensor_fsrRight()
-	local result = bhlowcmd.get_sensor_fsrRight();
+	local result = lua_dcmII.get_sensor_fsrRight();
 	return result;
 end
 
 function set_actuator_ledFootLeft(values)
-	bhlowcmd.set_actuator_ledFootLeft(values);
+	lua_dcmII.set_actuator_ledFootLeft(values);
 end
 
 function set_actuator_ledFootRight(values)
-	bhlowcmd.set_actuator_ledFootRight(values);
+	lua_dcmII.set_actuator_ledFootRight(values);
 end
 
 function set_actuator_ledEarsLeft(values)
-	bhlowcmd.set_actuator_ledEarsLeft(values);
+	lua_dcmII.set_actuator_ledEarsLeft(values);
 end
 
 function set_actuator_ledEarsRight(values)
-	bhlowcmd.set_actuator_ledEarsRight(values);
+	lua_dcmII.set_actuator_ledEarsRight(values);
 end
 
 function set_actuator_ledFaceLeft(values, index)
 	if (index) then
-		bhlowcmd.set_actuator_ledFaceLeft(values, index);
+		lua_dcmII.set_actuator_ledFaceLeft(values, index);
 	else
-		bhlowcmd.set_actuator_ledFaceLeft(values, 1);
+		lua_dcmII.set_actuator_ledFaceLeft(values, 1);
 	end
 end
 
 function set_actuator_ledFaceRight(values, index)
 	if (index) then
-		bhlowcmd.set_actuator_ledFaceRight(values, index);
+		lua_dcmII.set_actuator_ledFaceRight(values, index);
 	else
-		bhlowcmd.set_actuator_ledFaceRight(values, 1);
+		lua_dcmII.set_actuator_ledFaceRight(values, 1);
 	end
 end
 
 function set_actuator_ledChest(values)
-	bhlowcmd.set_actuator_ledChest(values);
+	lua_dcmII.set_actuator_ledChest(values);
 end
 
 function set_actuator_ledHead(values)
-	bhlowcmd.set_actuator_ledHead(values);
+	lua_dcmII.set_actuator_ledHead(values);
 end

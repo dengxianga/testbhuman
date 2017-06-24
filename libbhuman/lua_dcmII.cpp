@@ -995,7 +995,7 @@ static int set_actuator_ledHead(lua_State *L) {
 }
 
 
-static const struct luaL_Reg bhlowcmd_lib [] = {
+static const struct luaL_Reg lua_dcmII_lib [] = {
   {"getdummy", luaBH_getdummy},
 
   {"set_actuator_hardnesses", set_actuator_hardnesses},
@@ -1059,11 +1059,11 @@ static const struct luaL_Reg bhlowcmd_lib [] = {
 };
 
 
-extern "C" int luaopen_bhlowcmd(lua_State *L) {
+extern "C" int luaopen_lua_dcmII(lua_State *L) {
 #if LUA_VERSION_NUM == 502
-  luaL_newlib(L, bhlowcmd_lib);
+  luaL_newlib(L, lua_dcmII_lib);
 #else
-  luaL_register(L, "bhlowcmd", bhlowcmd_lib);
+  luaL_register(L, "lua_dcmII", lua_dcmII_lib);
 #endif
   return 1;
 }
