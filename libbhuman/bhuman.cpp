@@ -12,7 +12,9 @@
 #include <ctime>
 #include <cstring>
 #include <iostream>
+#include <fstream>
 #include <assert.h>
+#include <sys/time.h>
 #include "bhuman.h"
 
 //LBHData* data;
@@ -419,6 +421,7 @@ private:
 
   int startPressedTime; /**< The last time the chest button was not pressed. */
   unsigned lastBHumanStartTime; /**< The last time bhuman was started. */
+  // struct timeval tv;
 
   /** Close all resources acquired. Called when initialization failed or during destruction. */
   void close()
@@ -634,7 +637,6 @@ private:
     }
   }
   void set_shm_actuators(float* buffer){
-
     float * actuators;
     // theInstance->openActuators(actuators);
 
@@ -648,7 +650,29 @@ private:
     // buffer[0] = cos(loopcnt*0.01f);
     for (unsigned int i = 0; i < lbhNumOfActuatorIds; i++) {
       actuators[i] = buffer[i];
+      // actuators[lbhNumOfPositionActuatorIds] = 0.5;
     }
+
+    // ///////// Compare bhuman controlled with lua controlled ////
+    // std::ofstream myfile;
+    // myfile.open ("time_difference.txt", std::ios_base::app);
+    // myfile << std::fixed;
+
+    // struct timeval tv;
+    // gettimeofday(&tv, NULL);
+    // double time = tv.tv_sec + 1E-6*tv.tv_usec;
+
+    // myfile << 1 << " "; 
+    // myfile << time << " "; 
+    // myfile << buffer[0] << "\n";
+
+    // // myfile << 2 << " "; 
+    // // myfile << time << " "; 
+    // // myfile << data->sensors[data->newestSensors][0] << "\n";
+
+    // myfile.close();
+    // //////////////////////////////////////////////////////////////
+
 
     theInstance->closeActuators();
   }
@@ -672,25 +696,25 @@ private:
         actuatorDrops = 0;
       lastReadingActuators = data->readingActuators;
       float* readingActuators = data->actuators[data->readingActuators];
-      float* actuators = handleState(readingActuators);
+      // float* actuators = handleState(readingActuators);
 
 
       // ---------------------debug here..............
 
-      actuators = readingActuators; // TODO: this is a hack for now, set actuators by brute force
-      if (canprint){
-        std::cout<<"state "<<state<<std::endl;
-        std::cout<< "readingActuators  set  ";
-        for(int i = 0; i < lbhNumOfPositionActuatorIds; ++i){
-            std::cout<<readingActuators[i]<<" ";
-        }
-        std::cout<<std::endl;
-        std::cout<< "Actuators  set  ";
-        for(int i = 0; i < lbhNumOfPositionActuatorIds; ++i){
-            std::cout<<actuators[i]<<" ";
-        }
-        std::cout<<std::endl;
-      }
+      float* actuators = readingActuators; // TODO: this is a hack for now, set actuators by brute force
+      // if (canprint){
+      //   std::cout<<"state "<<state<<std::endl;
+      //   std::cout<< "readingActuators  set  ";
+      //   for(int i = 0; i < lbhNumOfPositionActuatorIds; ++i){
+      //       std::cout<<readingActuators[i]<<" ";
+      //   }
+      //   std::cout<<std::endl;
+      //   std::cout<< "Actuators  set  ";
+      //   for(int i = 0; i < lbhNumOfPositionActuatorIds; ++i){
+      //       std::cout<<actuators[i]<<" ";
+      //   }
+      //   std::cout<<std::endl;
+      // }
       //////////////////////////////////////////////////
 
 
@@ -703,6 +727,21 @@ private:
       //     copyNonServos(readingActuators, actuators);
       // }
       // setBatteryLeds(actuators);
+
+
+      // std::ofstream myfile;
+      // myfile.open ("time_difference.txt", std::ios_base::app);
+      // myfile << std::fixed;
+
+      // struct timeval tv;
+      // gettimeofday(&tv, NULL);
+      // double time = tv.tv_sec + 1E-6*tv.tv_usec;
+
+      // myfile << 2 << " "; 
+      // myfile << time << " "; 
+      // myfile << data->sensors[data->newestSensors][0] << "\n";
+
+      // myfile.close();
 
       // set position actuators
       positionRequest[4][0] = dcmTime; // 0 delay!
@@ -865,18 +904,50 @@ private:
     //theInstance->set_shm_actuators();
 
     //--------------end of test
-
-    if (data->luaNewSet) {
+    // if (canprint)
+    while (!data->luaNewSet);
+    // if (data->luaNewSet){
+       /////////////// save time /////////////
+      // struct timeval tv;
+      // gettimeofday(&tv, NULL);
+      // data->time_at_set = tv.tv_sec + 1E-6*tv.tv_usec;
+      // data->naoqi_sensor_value = data->sensors[data->newestSensors][0];
+      ///////////////////////////////////////
+      data->bufferInUse = true;
       theInstance->set_shm_actuators(data->luaBuffer);
+      data->bufferInUse = false;
+      theInstance->setActuators();
       data->luaNewSet = false;
-    }
+      data->no_new_data_cnt = 0;
+    // } else {
+    //   data->no_new_data_cnt ++;
+    //   std::cout<<"no new data from lua count: " << data->no_new_data_cnt << std::endl;
+
+        // /////////// Compare data->luaBuffer in lua_dcmII and bhuman////
+        // std::ofstream myfile;
+        // myfile.open ("compare_luabuffer.txt",std::ios_base::app);
+        // myfile << std::fixed;
+
+        // gettimeofday(&tv, NULL);
+        // double time = tv.tv_sec + 1E-6*tv.tv_usec;
+
+        // myfile << 2 << " "; 
+        // myfile << time << " "; 
+        // myfile << data->luaBuffer[0] << "\n";
+        // myfile.close();
+        // //////////////////////////////////////////////////////////////
+    // }
+
+    // gettimeofday(&tv, NULL);
+    // std::cout << std::fixed;
+    // std::cout<< tv.tv_sec + 1E-6*tv.tv_usec << std::endl;
 
     // theInstance->set_shm_actuators(data->luaBuffer);
     // data->dcmTime = theInstance->dcmTime;
     // data->newTime = true;
     //DP commented
     //std::cout<<theInstance->dcmTime<<std::endl;
-    theInstance->setActuators();
+    
 
     // std::cout << actuatorNames[rFootLedRedActuator]<< actuatorNames[rFootLedGreenActuator] << actuatorNames[rFootLedBlueActuator]<< std::endl;
   }

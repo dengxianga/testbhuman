@@ -35,8 +35,8 @@ end
 local function rotate_joint()
 	local hardnesses = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0, 0, 0, 0};
 	hardnesses[1] = 0.5;
-	hardnesses[3] = 0.5;
-	hardnesses[19] = 0.5;
+	-- hardnesses[3] = 0.5;
+	-- hardnesses[19] = 0.5;
 	local positions = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0, 0, 0, 0};
 	Body.set_actuator_hardness(hardnesses);
 	local speed = 0.005*0.1;
@@ -45,7 +45,7 @@ local function rotate_joint()
 		if (count % 20 == 0)  then 
 			new_pos = math.cos(speed * count);
 			Body.set_actuator_position(new_pos, 1);
-			sleep(0.005*0.33);
+			sleep(0.005);
 		end
 		count = count + 1;
 	end
@@ -222,11 +222,11 @@ end
 --set_actuator_hardnesses_test_1()
 -- local sensorinfo = Body.get_sensor_temperature();
 -- print(unpack(Body.get_sensor_temperature()))
--- while 1 do	
-  rotate_joint();
--- 	--print(Body.get_sensor_ultraSonic());
--- 	-- get_time_test();
--- 	sleep(1);
--- end
+while 1 do	
+  
+	--print(Body.get_sensor_ultraSonic());
+	get_sensor_button_test();
+	sleep(1);
+end
 
 print("done!");

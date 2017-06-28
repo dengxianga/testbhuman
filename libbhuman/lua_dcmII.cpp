@@ -27,6 +27,7 @@
 #pragma clang diagnostic pop
 #endif
 
+#include <fstream>
 #include <iostream>
 #include <lua.hpp>
 
@@ -35,6 +36,7 @@
 using namespace std;
 double speed = 0.01;
 double current_time = 0;
+struct timeval tv;
 
 enum jointNames { 
 HeadYaw = 0, 
@@ -127,7 +129,9 @@ int fd;
 LBHData * data;
 bool initialized = false;
 int writingActuators = -1;
+bool v_in_use = false;
 std::vector<double> v(lbhNumOfPositionActuatorIds);
+int missed_set = 0;
 
 static int luaBH_getdummy (lua_State *L) {
   lua_pushnumber(L, 0);
@@ -147,29 +151,19 @@ static void lua_initialize () {
   fd = shm_open(LBH_MEM_NAME, O_RDWR, S_IRUSR | S_IWUSR);
   data = (LBHData*)mmap(NULL, sizeof(LBHData), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
   initialized = true;
+}
 
-  // luaToBHumanPos[HeadYaw] = headYawPositionActuator;
-  // luaToBHumanPos[HeadPitch] = headPitchPositionActuator;
-  // luaToBHumanPos[LShoulderPitch] = lShoulderPitchPositionActuator;
-  // luaToBHumanPos[LShoulderRoll] = lShoulderRollPositionActuator;
-  // luaToBHumanPos[LElbowYaw] = lElbowYawPositionActuator;
-  // luaToBHumanPos[LElbowRoll] = lElbowRollPositionActuator;
-  // luaToBHumanPos[LHipYawPitch] = lHipYawPitchPositionActuator;
-  // luaToBHumanPos[LHipRoll] = lHipRollPositionActuator;
-  // luaToBHumanPos[LHipPitch] = lHipPitchPositionActuator;
-  // luaToBHumanPos[LKneePitch] = lKneePitchPositionActuator;
-  // luaToBHumanPos[LAnklePitch] = lAnklePitchPositionActuator;
-  // luaToBHumanPos[LAnkleRoll] = lAnkleRollPositionActuator;
-  // luaToBHumanPos[RHipYawPitch] = lHipYawPitchPositionActuator;
-  // luaToBHumanPos[RHipRoll] = rHipRollPositionActuator;
-  // luaToBHumanPos[RHipPitch] = rHipPitchPositionActuator;
-  // luaToBHumanPos[RKneePitch] = rKneePitchPositionActuator;
-  // luaToBHumanPos[RAnklePitch] = rAnklePitchPositionActuator;
-  // luaToBHumanPos[RAnkleRoll] = rAnkleRollPositionActuator;
-  // luaToBHumanPos[RShoulderPitch] = rShoulderPitchPositionActuator;
-  // luaToBHumanPos[RShoulderRoll] = rShoulderRollPositionActuator;
-  // luaToBHumanPos[RElbowYaw] = rElbowYawPositionActuator;
-  // luaToBHumanPos[RElbowRoll] = rElbowRollPositionActuator;
+static int get_time(lua_State *L) {
+  if (!initialized) {
+    lua_initialize();
+  }
+
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  double t = tv.tv_sec + 1E-6*tv.tv_usec;
+
+  lua_pushnumber(L, t);
+  return 1;
 }
 
 static void lua_pushdouble_array(lua_State *L, double *v, int n) {
@@ -189,32 +183,22 @@ static void lua_pushvector(lua_State *L, std::vector<double> &v) {
   }
 }
 
-// static std::vector<double> lua_checkvector(lua_State *L, int narg) {
-//   if (!lua_istable(L, narg))
-//     luaL_typerror(L, narg, "vector");
-//   int n = lua_objlen(L, narg);
-//   std::vector<double> v(n);
-//   for (int i = 0; i < n; i++) {
-//     lua_rawgeti(L, narg, i+1);
-//     v[i] = lua_tonumber(L, -1);
-//     lua_pop(L, 1);
-//   }
-//   return v;
-// }
-
 static std::vector<double> lua_checkvector(lua_State *L, int narg) {
   if (!lua_istable(L, narg))
     luaL_typerror(L, narg, "vector");
-  int n = lua_objlen(L, narg);
-  for (int i = 0; i < n; i++) {
-    lua_rawgeti(L, narg, i+1);
-    v[i] = lua_tonumber(L, -1);
-    lua_pop(L, 1);
+  if (!v_in_use) {
+    v_in_use = true;
+    int n = lua_objlen(L, narg);
+    for (int i = 0; i < n; i++) {
+      lua_rawgeti(L, narg, i+1);
+      v[i] = lua_tonumber(L, -1);
+      lua_pop(L, 1);
+    }
+    v_in_use = false;
   }
 
   return v;
 }
-
 
 static int set_actuator_positions(lua_State *L) {
   if (!initialized) {
@@ -223,13 +207,18 @@ static int set_actuator_positions(lua_State *L) {
   std::vector<double> vs = lua_checkvector(L, 1);
   std::vector<double> ids = lua_checkvector(L, 2);
 
-  int size = lua_objlen(L, 1);
+  while (data->bufferInUse);
 
+  int size = lua_objlen(L, 1);
   for (unsigned int i = 0; i < size; i++) {
-    data->luaBuffer[(int)ids[i]-1] = vs[i];
+    int bHumanIndex = luaToBHumanPos[(int) ids[i] - 1];
+    data->luaBuffer[bHumanIndex] = vs[i];
   }
 
   data->luaNewSet = true;
+  gettimeofday(&tv, NULL);
+  data->time_at_command = tv.tv_sec + 1E-6*tv.tv_usec;
+  missed_set = 0;
 
   return 0;
 }
@@ -241,37 +230,21 @@ static int set_actuator_hardnesses(lua_State *L) {
   std::vector<double> vs = lua_checkvector(L, 1);
   std::vector<double> ids = lua_checkvector(L, 2);
 
-	//data->readingSensors = data->newestSensors;
-  //float * sensors = data->sensors[data->newestSensors];
-
-	//data->readingActuators = data->newestActuators;
-	//float * actuators = data->actuators[data->readingActuators];
-
-	//float epsilon = 0.1;
+	while (data->bufferInUse);
   int size = lua_objlen(L, 1);
 
   for (unsigned int i = 0; i < size; i++) {
     int bHumanIndex = luaToBHumanPos[(int) ids[i] - 1];
-	//	if (abs(sensors[bHumanIndex*3] - actuators[bHumanIndex])>epsilon) {
-	//		std::cout << "in hardnesses" << std::endl;
-	//		data->luaBuffer[bHumanIndex] = sensors[bHumanIndex*3];
-	//	}
+  //  if (abs(sensors[bHumanIndex*3] - actuators[bHumanIndex])>epsilon) {
+  //    std::cout << "in hardnesses" << std::endl;
+  //    data->luaBuffer[bHumanIndex] = sensors[bHumanIndex*3];
+  //  }
 
     data->luaBuffer[bHumanIndex + lbhNumOfPositionActuatorIds] = vs[i];
   }
 
   data->luaNewSet = true;
-
-	// not DP FL
-  // std::vector<double> hardness_values = lua_checkvector(L, 1);
-  // int startIndex = luaL_checkint(L, 2) - 1;
-  
-  // for (int i = startIndex; i < startIndex + hardness_values.size(); i++) {
-  //   int bHumanIndex = luaToBHumanPos[i];
-  //   data->luaBuffer[bHumanIndex + lbhNumOfPositionActuatorIds] = hardness_values[i];
-  // }
-
-  // data->luaNewSet = true;
+  missed_set = 0;
 
   return 0;
 }
@@ -284,44 +257,78 @@ static int set_actuator_position(lua_State *L) {
   double x = luaL_checknumber(L, 1);
   int index = luaL_checkint(L, 2) - 1; // convert to zero-indexed
 
-	//data->readingSensors = data->newestSensors;
-  //float * sensors = data->sensors[data->newestSensors];
+  // std::cout << std::fixed;
+  // std::cout<< data->time_at_command << " " << data->time_at_set << std::endl;
+  
+  // ////// printing command and expected/actual positions/////////
+  // std::ofstream myfile;
+  // myfile.open ("time_difference.txt",std::ios_base::app);
+  // myfile << std::fixed;
 
-  int bHumanIndex = luaToBHumanPos[index];
-  data->luaBuffer[bHumanIndex] = x;
+  // myfile << 3 << " "; 
+  // myfile << data->time_at_set << " "; 
+  // myfile << data->naoqi_sensor_value << "\n";
 
-  data->luaNewSet = true;
+  // gettimeofday(&tv, NULL);
+  // double time = tv.tv_sec + 1E-6*tv.tv_usec;
+
+  // myfile << 1 << " "; 
+  // myfile << time << " "; 
+  // myfile << x << "\n";
+  // ///////////////////////////////////////
+
+  while (data->bufferInUse);
+  // if (!data->luaNewSet) {
+    int bHumanIndex = luaToBHumanPos[index];
+    data->luaBuffer[bHumanIndex] = x;
+
+    data->luaNewSet = true;    
+    // gettimeofday(&tv, NULL);
+    // data->time_at_command = tv.tv_sec + 1E-6*tv.tv_usec;
+    // missed_set = 0;
+  // } else {
+  //   missed_set++;
+  //   std::cout<< "naoqi not ready for set count: " << missed_set << std::endl;
+  // }
+  // ///////// more printing/////////////
+  // gettimeofday(&tv, NULL);
+  // time = tv.tv_sec + 1E-6*tv.tv_usec;
+  // myfile << 2 << " "; 
+  // myfile << time << " "; 
+  // myfile << x << "\n";
+  // myfile.close();
+  // ////////////////////////////////////
 
   return 0;
 }
 
-static int set_actuator_positions_adjust(lua_State *L) {
-	if (!initialized) {
-		lua_initialize();
-	}
+// static int set_actuator_positions_adjust(lua_State *L) {
+// 	if (!initialized) {
+// 		lua_initialize();
+// 	}
 	
-  std::vector<double> ids = lua_checkvector(L, 1);
+//   std::vector<double> ids = lua_checkvector(L, 1);
 
-	data->readingSensors = data->newestSensors;
-  float * sensors = data->sensors[data->newestSensors];
+// 	data->readingSensors = data->newestSensors;
+//   float * sensors = data->sensors[data->newestSensors];
 	
-	data->readingActuators = data->newestActuators;
-  float * actuators = data->actuators[data->readingActuators];
+// 	data->readingActuators = data->newestActuators;
+//   float * actuators = data->actuators[data->readingActuators];
 
-	float scale = 0.1;
+// 	float scale = 0.1;
   
-  int size = lua_objlen(L, 1);
+//   int size = lua_objlen(L, 1);
 
-  for (unsigned int i = 0; i < size; i++) {
-    int bHumanIndex = luaToBHumanPos[(int) ids[i] - 1];
-		double error = actuators[bHumanIndex] - sensors[bHumanIndex*3];
-		data->luaBuffer[bHumanIndex] = actuators[bHumanIndex] + scale*error;
-	}
+//   for (unsigned int i = 0; i < size; i++) {
+//     int bHumanIndex = luaToBHumanPos[(int) ids[i] - 1];
+// 		double error = actuators[bHumanIndex] - sensors[bHumanIndex*3];
+// 		data->luaBuffer[bHumanIndex] = actuators[bHumanIndex] + scale*error;
+// 	}
 
-  data->luaNewSet = true;
+//   data->luaNewSet = true;
 	
-	return 0;
-}
+// 	return 0;
+// }
 
 static int set_actuator_command_adjust(lua_State *L) {
 	if (!initialized) {
@@ -682,22 +689,6 @@ static int get_actuator_velocity(lua_State *L) {
   return 0;
 }
 
-static int get_time(lua_State *L) {
-  if (!initialized) {
-    lua_initialize();
-  }
-  // //while (!data->newTime) {} // wait for new time
-  // lua_pushnumber(L, data->dcmTime);
-  // // data->newTime = false;
-
-  struct timeval tv;
-  gettimeofday(&tv, NULL);
-  double t = tv.tv_sec + 1E-6*tv.tv_usec;
-
-  lua_pushnumber(L, t);
-  return 1;
-}
-
 static int get_sensor_batteryCharge(lua_State *L) {
   if (!initialized) {
     lua_initialize();
@@ -713,10 +704,11 @@ static int get_sensor_button(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
-
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
   lua_pushnumber(L, sensors[chestButtonSensor]);
+  // double x[1] = {sensors[chestButtonSensor]};
+  // lua_pushdouble_array(L, x, 1);
   return 1;
 }
 
@@ -984,7 +976,7 @@ static const struct luaL_Reg bhlowcmd_lib [] = {
   {"set_actuator_hardnesses", set_actuator_hardnesses},
   {"set_actuator_positions", set_actuator_positions},
   {"set_actuator_position", set_actuator_position},
-	{"set_actuator_positions_adjust", set_actuator_positions_adjust},
+	// {"set_actuator_positions_adjust", set_actuator_positions_adjust},
 	{"set_actuator_command_adjust", set_actuator_command_adjust},
   {"set_actuator_hardness", set_actuator_hardness},  
 

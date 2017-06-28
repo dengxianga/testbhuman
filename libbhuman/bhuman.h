@@ -346,15 +346,19 @@ enum BHState
 
 struct LBHData
 {
-
-  bool luaNewSet; //**< Has the lua code set new actuator/hardness values?
-  bool initialized; //**< Is this data structure initialized?
+  volatile bool luaNewSet; //**< Has the lua code set new actuator/hardness values?
+  volatile bool bufferInUse; //**< Bhuman.cpp copying values from luaBuffer to actuators?
+  volatile bool initialized; //**< Is this data structure initialized?
   volatile int readingSensors; /**< Index of sensor data reserved for reading. */
   volatile int newestSensors; /**< Index of the newest sensor data. */
   volatile int readingActuators; /**< Index of actuator commands reserved for reading. */
   volatile int newestActuators; /**< Index of the newest actuator command. */
   volatile int dcmTime; //**< System time from naoqi
-  bool newTime; //**< Has naoqi given a new time?
+  volatile int no_new_data_cnt; 
+  volatile double time_at_command;
+  volatile double time_at_set;
+  volatile float naoqi_sensor_value;
+
 
   char bodyId[16]; /* Device/DeviceList/ChestBoard/BodyId */
   char headId[16]; /* RobotConfig/Head/FullHeadId */
@@ -368,7 +372,8 @@ struct LBHData
   unsigned bhumanStartTime;
 
   LBHData(){initialized=false; 
-            luaNewSet = false;}
+            luaNewSet = false;
+            bufferInUse = false;}
 };
 
 //extern LBHData * data;

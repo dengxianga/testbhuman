@@ -134,7 +134,7 @@ function get_sensor_bumperRight_test()
 end
 
 function get_sensor_button_test()
-	print(Body.get_sensor_button())
+	print(unpack(Body.get_sensor_button()))
 end
 
 function get_sensor_usLeft_test()
@@ -184,7 +184,7 @@ end
 while 1 do	
   
 	--print(Body.get_sensor_ultraSonic());
-	get_time_test();
+	get_sensor_button_test();
 	sleep(1);
 end
 

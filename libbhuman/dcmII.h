@@ -44,6 +44,8 @@ class DcmII {
     // std::ofstream write_file;
     DcmII();
     int testfunction();
+    void set_actuator_positions_bh_order(float* vs);
+    void set_actuator_hardnesses_bh_order(float* vs);
 		void set_actuator_position(float x, int index);
     void set_actuator_positions(float* vs, int* ids);
 		void set_actuator_hardness(float x, int index);
