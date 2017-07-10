@@ -184,7 +184,7 @@ end
 while 1 do	
   
 	--print(Body.get_sensor_ultraSonic());
-	get_sensor_button_test();
+	get_time_test();
 	sleep(1);
 end
 

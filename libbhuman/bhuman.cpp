@@ -832,12 +832,6 @@ private:
       float* sensors = data->sensors[writingSensors];
       for(int i = 0; i < lbhNumOfSensorIds; ++i)
         sensors[i] = *sensorPtrs[i]; 
-      
-     // for(int i = lUsSensor; i <= rUs9Sensor; ++i) {
-     //   std::cout << "bhuman.cpp index: " << i << std::endl;
-     //   std::cout << "sensor values" << sensors[i] << std::endl;
-       // std::cout << sensorNames[UsSensor] << std::endl;
-     // }
 
       // // ---------------------debug here.............
 
@@ -905,7 +899,7 @@ private:
 
     //--------------end of test
     // if (canprint)
-    while (!data->luaNewSet);
+    while (!data->luaNewSet && !data->luaRequestSensor);
     // if (data->luaNewSet){
        /////////////// save time /////////////
       // struct timeval tv;
@@ -918,7 +912,7 @@ private:
       data->bufferInUse = false;
       theInstance->setActuators();
       data->luaNewSet = false;
-      data->no_new_data_cnt = 0;
+      // data->no_new_data_cnt = 0;
     // } else {
     //   data->no_new_data_cnt ++;
     //   std::cout<<"no new data from lua count: " << data->no_new_data_cnt << std::endl;

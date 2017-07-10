@@ -1,6 +1,9 @@
 -- For testing bhlowcmd and NaobodyII.lua
-
-Body = require('Lib/NaoBodyII');
+cwd = cwd or os.getenv('PWD')
+package.path = cwd.."/?.lua;"..package.path;
+require("init")
+require("Config")
+require("Body")
 
 local indexHead = 1;
 local nJointHead = 2;
@@ -225,7 +228,7 @@ end
 while 1 do	
   
 	--print(Body.get_sensor_ultraSonic());
-	get_sensor_button_test();
+	print(unpack(Body.get_sensor_position()));
 	sleep(1);
 end
 

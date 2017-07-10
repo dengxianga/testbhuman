@@ -11,7 +11,7 @@ function sleep(n)  -- seconds
 end
 
 while 1 do 
-	print(Body.get_time, unpack(Body.get_sensor_temperature()));
+	print(Body.get_time(), unpack(Body.get_sensor_temperature()));
 	sleep(1);
 
 end

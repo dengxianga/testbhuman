@@ -400,12 +400,16 @@ static int get_actuator_position(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
+
   int index = luaL_checkint(L, 1) - 1; // convert to zero-indexed
   data->readingActuators = data->newestActuators;
   float * actuators = data->actuators[data->readingActuators];
 
   int bHumanIndex = luaToBHumanPos[index];
   lua_pushnumber(L, (double) actuators[bHumanIndex]);
+
   return 1;
 }
 
@@ -416,6 +420,9 @@ static int get_actuator_positions(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
+
   data->readingActuators = data->newestActuators;
   float * actuators = data->actuators[data->readingActuators];
 
@@ -437,6 +444,9 @@ static int get_actuator_hardness(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
+
   int index = luaL_checkint(L, 1) - 1; // convert to zero-indexed
   data->readingActuators = data->newestActuators;
   float * actuators = data->actuators[data->readingActuators];
@@ -491,6 +501,9 @@ static int get_actuator_command(lua_State *L) {
     case indexRArm: numActuators = nJointRArm; break;
   }
 
+
+  data->luaRequestSensor = true;
+
   data->readingActuators = data->newestActuators;
   float * actuators = data->actuators[data->newestActuators];
   double actuatorCommands[numActuators];
@@ -506,6 +519,8 @@ static int get_sensor_position(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
 
   int index = luaL_checkint(L, 1) - 1; // convert to zero-indexed
 
@@ -524,6 +539,9 @@ static int get_sensor_positions(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
+
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->newestSensors];
   double actuatorSensors[nJoint];
@@ -543,6 +561,9 @@ static int get_actuator_hardnesses(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
+
   data->readingActuators = data->newestActuators;
   float * actuators = data->actuators[data->readingActuators];
   double actuatorHardnesses[nJoint];
@@ -563,6 +584,9 @@ static int get_imu_angle(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
+
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
   double ImuReadings[3] = {(double) sensors[angleXSensor], (double) sensors[angleYSensor], (double) sensors[angleZSensor]};
@@ -577,6 +601,9 @@ static int get_imu_acc(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
+
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
   double AccReadings[3] = {(double) sensors[accXSensor], (double) sensors[accYSensor], (double) sensors[accZSensor]};
@@ -591,6 +618,9 @@ static int get_imu_gyr(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
+
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
   double GyroReadings[3] = {(double) sensors[gyroXSensor], (double) sensors[gyroYSensor], (double) -sensors[gyroZSensor]};
@@ -622,6 +652,9 @@ static int set_actuator_position_forever(lua_State *L) {
     if (data->luaNewSet == false) {
       std::vector<double> vs = lua_checkvector(L, 1);
       
+
+      data->luaRequestSensor = true;
+
       vs[0] = cos(speed*cnt);
       // std::vector<float> vs;
       // vs.push_back(cos(0.01*cnt));
@@ -659,6 +692,8 @@ static int get_sensor_current(lua_State *L) {
   // lua_pushnumber(L, (double) 1000 * sensors[3*bHumanIndex+1]);
   // return 1;
 
+  data->luaRequestSensor = true;
+
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
 
@@ -675,6 +710,7 @@ static int set_actuator_velocity(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
   double x = luaL_checknumber(L, 1);
   int index = luaL_checkint(L, 2) - 1; // convert to zero-indexed
   return 0;
@@ -684,6 +720,9 @@ static int get_actuator_velocity(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
+
   int index = luaL_checkint(L, 1) - 1; // convert to zero-indexed
   lua_pushnumber(L, 0);
   return 0;
@@ -693,6 +732,8 @@ static int get_sensor_batteryCharge(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
 
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
@@ -704,6 +745,9 @@ static int get_sensor_button(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
+
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
   lua_pushnumber(L, sensors[chestButtonSensor]);
@@ -717,6 +761,8 @@ static int get_sensor_bumperLeft(lua_State *L) {
     lua_initialize();
   }
 
+  data->luaRequestSensor = true;
+
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
   double bumperReadings[2] = {(double) sensors[lBumperLeftSensor], (double) sensors[lBumperRightSensor]};
@@ -729,6 +775,8 @@ static int get_sensor_bumperRight(lua_State *L) {
     lua_initialize();
   }
 
+  data->luaRequestSensor = true;
+
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
   double bumperReadings[2] = {(double) sensors[rBumperLeftSensor], (double) sensors[rBumperRightSensor]};
@@ -740,6 +788,8 @@ static int get_sensor_sonarLeft(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
 
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
@@ -758,6 +808,8 @@ static int get_sensor_sonarRight(lua_State *L) {
     lua_initialize();
   }
 
+  data->luaRequestSensor = true;
+
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
 
@@ -773,6 +825,8 @@ static int get_sensor_temperature(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
 
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
@@ -792,6 +846,8 @@ static int set_actuator_ultraSonic(lua_State *L) {
     lua_initialize();
   }
 
+  data->luaRequestSensor = true;
+
   int command = luaL_checknumber(L, 1);
 
   data->luaBuffer[usActuator] = command;
@@ -805,6 +861,8 @@ static int get_sensor_fsrLeft(lua_State *L) {
     lua_initialize();
   }
 
+  data->luaRequestSensor = true;
+
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
   double fsrSensors[4] = {(double) sensors[lFSRFrontLeftSensor], (double) sensors[lFSRRearLeftSensor], (double) sensors[lFSRFrontRightSensor], (double) sensors[lFSRRearRightSensor]};
@@ -817,6 +875,8 @@ static int get_sensor_fsrRight(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
 
   data->readingSensors = data->newestSensors;
   float * sensors = data->sensors[data->readingSensors];
@@ -844,15 +904,11 @@ static int set_actuator_ledFootLeft(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
+
   std::vector<double> values = lua_checkvector(L, 1);
-
-  std::cout<< "Left red:" << data->actuators[data->newestActuators][lFootLedRedActuator] << std::endl; 
-  std::cout<< "Left green:" << data->actuators[data->newestActuators][lFootLedGreenActuator] << std::endl;  
-  std::cout<< "Left blue:" << data->actuators[data->newestActuators][lFootLedBlueActuator] << std::endl; 
-
-  std::cout<< "Buffer Left red:" << data->luaBuffer[lFootLedRedActuator] << std::endl; 
-  std::cout<< "Buffer Left green:" << data->luaBuffer[lFootLedGreenActuator] << std::endl;  
-  std::cout<< "Buffer Left blue:" << data->luaBuffer[lFootLedBlueActuator] << std::endl;     
+   
   for (unsigned int i = 0; i < 3; i++) {
     std::cout<<"l " << i << "   "<< values[i] << std::endl;
     data->luaBuffer[i + lFootLedRedActuator] = values[i];
@@ -866,6 +922,9 @@ static int set_actuator_ledFootRight(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
+
   std::vector<double> values = lua_checkvector(L, 1);
 
   for (unsigned int i = 0; i < 3; i++) {
@@ -881,6 +940,9 @@ static int set_actuator_ledEarsLeft(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
+
   std::vector<double> values = lua_checkvector(L, 1);
 
   for (unsigned int i = 0; i < 10; i++) {
@@ -896,6 +958,9 @@ static int set_actuator_ledEarsRight(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
+
   std::vector<double> values = lua_checkvector(L, 1);
 
   for (unsigned int i = 0; i < 10; i++) {
@@ -911,6 +976,9 @@ static int set_actuator_ledFaceLeft(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
+
   std::vector<double> values = lua_checkvector(L, 1);
   int index = luaL_checkint(L, 2) - 1;
 
@@ -927,6 +995,9 @@ static int set_actuator_ledFaceRight(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
+
   std::vector<double> values = lua_checkvector(L, 1);
   int index = luaL_checkint(L, 2) - 1;
 
@@ -943,6 +1014,9 @@ static int set_actuator_ledChest(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
+
   std::vector<double> values = lua_checkvector(L, 1);
 
   for (unsigned int i = 0; i < 3; i++) {
@@ -958,6 +1032,9 @@ static int set_actuator_ledHead(lua_State *L) {
   if (!initialized) {
     lua_initialize();
   }
+
+  data->luaRequestSensor = true;
+  
   std::vector<double> values = lua_checkvector(L, 1);
 
   for (unsigned int i = 0; i < values.size(); i++) {

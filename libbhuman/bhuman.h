@@ -347,6 +347,7 @@ enum BHState
 struct LBHData
 {
   volatile bool luaNewSet; //**< Has the lua code set new actuator/hardness values?
+  volatile bool luaRequestSensor; //** Has the lua code requested sensor values?
   volatile bool bufferInUse; //**< Bhuman.cpp copying values from luaBuffer to actuators?
   volatile bool initialized; //**< Is this data structure initialized?
   volatile int readingSensors; /**< Index of sensor data reserved for reading. */
