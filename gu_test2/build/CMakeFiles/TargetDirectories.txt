@@ -1,0 +1,3 @@
+/home/nao/gu_test2/build/CMakeFiles/edit_cache.dir
+/home/nao/gu_test2/build/CMakeFiles/test_getup.dir
+/home/nao/gu_test2/build/CMakeFiles/rebuild_cache.dir
