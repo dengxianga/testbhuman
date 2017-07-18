@@ -5,7 +5,7 @@
 
 int main() {
 	GetUpEngine gup;
-	gup.generateLuaMof(Mof::backFast);
+	gup.generateLuaMof(Mof::frontFast);
 
 	std::cout << "hello world" << std::endl;
 }

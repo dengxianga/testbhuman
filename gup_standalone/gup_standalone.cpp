@@ -543,11 +543,11 @@ void GetUpEngine::generateLuaMof(Mof::Motion motionName) {
 
       float dur = (float) p.mofs[motion].lines[i].duration / 1000;
       char duration[50];
-      sprintf(duration, "    duration = %.3f;\n", dur);
+      sprintf(duration, "    duration = %.3f,\n", dur);
       fputs(duration, f);
 
       char critical[20];
-      sprintf(critical, "    critical = %s\n", p.mofs[motion].lines[i].critical ? "true" : "false");
+      sprintf(critical, "    critical = %s\n;", p.mofs[motion].lines[i].critical ? "true" : "false");
       fputs(critical, f);
 
       fputs("  },\n", f);
